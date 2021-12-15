@@ -2,7 +2,7 @@
 module.exports = {
     outputDir: './dist/',
     runtimeCompiler: true,
-    publicPath: "/admin",
+    publicPath: "/",
 
     css: {
         loaderOptions: {

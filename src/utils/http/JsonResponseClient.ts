@@ -21,7 +21,6 @@ export default class JsonResponseClient extends Service implements IJsonResponse
   ): Promise<IJsonResponse> {
     if(this.debug) {
       await delay(2000);
-      console.log(url)
       if(this.facade != {})
         return this.facade[url.split("?")[0]];
     }
@@ -33,6 +32,8 @@ export default class JsonResponseClient extends Service implements IJsonResponse
       if(!processedHeaders[key])
         delete processedHeaders[key];
     }
+    if(body instanceof Object && files === undefined)
+      processedHeaders["content-type"] = EContentTypes.json;
     const response = await fetch(this.buildUrl(url), {
       method,
       headers: processedHeaders,
@@ -47,7 +48,7 @@ export default class JsonResponseClient extends Service implements IJsonResponse
     files?: IIndexableObject<FileList | File[]>,
     contentType?: EContentTypes
   ): BodyInit | null | undefined {
-    if (method == "GET" || method == "HEAD")
+    if (method == "GET" || method == "HEAD" || method == "DELETE" || method == "PUT")
       return null;
     else if (files || contentType == EContentTypes.multipart) {
       var formData = new FormData();
