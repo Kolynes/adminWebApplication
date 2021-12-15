@@ -14,8 +14,7 @@ export default class AgentEditorMixin extends Vue {
   agentsClient!: IAdminAgentsClient;
 
   createAgentDialogVisible = false;
-  firstName = "";
-  lastName = "";
+  name = "";
   email = "";
   password = "";
   phoneNumber = "";
@@ -46,8 +45,7 @@ export default class AgentEditorMixin extends Vue {
   }
 
   beginEditAgent(agent: IAgent) {
-    this.firstName = agent.firstName;
-    this.lastName = agent.lastName;
+    this.name = agent.name;
     this.email = agent.email;
     this.phoneNumber = agent.phoneNumber;
     this.selectedAgent = agent.id;
@@ -71,8 +69,7 @@ export default class AgentEditorMixin extends Vue {
       this.creatingAgent = true;
       const response = await this.agentsClient.updateAgent(
         this.selectedAgent!,
-        this.firstName,
-        this.lastName,
+        this.name,
         this.email,
         this.phoneNumber,
         this.availability
@@ -92,8 +89,7 @@ export default class AgentEditorMixin extends Vue {
       this.creatingAgent = true;
       const ride = await this.selectRide.getRide();
       const response = await this.agentsClient.createAgent(
-        this.firstName,
-        this.lastName,
+        this.name,
         this.email,
         this.phoneNumber,
         this.profilePhoto!,

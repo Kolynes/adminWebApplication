@@ -10,10 +10,10 @@ export default class LatestOrders extends Vue {
   }
 
   getDate(order: IOrder): string {
-    return order.date.substring(4, 6);
+    return (order.createdOnDate as string).substring(4, 6);
   }
 
   getMonthAndYear(order: IOrder): string {
-    return order.date.substring(1, 7);
+    return (order.createdOnDate as string).substring(1, 7);
   }
 }

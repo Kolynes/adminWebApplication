@@ -115,7 +115,7 @@ export default class ProductsEditorMixin extends Vue {
   async beginEditProduct(product: IProduct) {
     this.selectedProduct = product.id;
     this.name = product.name;
-    this.organizationId = product.organizationId;
+    this.organizationId = product.organization.id;
     this.description = product.description;
     this.price = product.price;
     this.quantityInStock = product.quantityInStock;

@@ -58,8 +58,7 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
 
   async updateAgent(
     id: number, 
-    firstName: string, 
-    lastName: string, 
+    name: string,
     email: string, 
     phoneNumber: string,
     availability: boolean,
@@ -68,8 +67,7 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
       return await this.http.patch(
         `/admin/users/agents/${id}`,
         {
-          firstName,
-          lastName,
+          name,
           email,
           phoneNumber,
           availability,
@@ -105,8 +103,7 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
   }
 
   async createAgent(
-    firstName: string, 
-    lastName: string, 
+    name: string, 
     email: string, 
     phoneNumber: string, 
     profilePhoto: File,
@@ -117,8 +114,7 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
       return await this.http.post(
         "/admin/users/agents",
         {
-          firstName,
-          lastName,
+          name,
           email,
           phoneNumber,
           rideId,

@@ -68,8 +68,7 @@ export interface IAdminAgentsClient extends Service {
 
   updateAgent(
     id: number,
-    firstName: string,
-    lastName: string,
+    name: string,
     email: string,
     phoneNumber: string,
     availability: boolean,
@@ -84,8 +83,7 @@ export interface IAdminAgentsClient extends Service {
   ): Promise<IJsonResponse>;
 
   createAgent(
-    firstName: string,
-    lastName: string,
+    name: string,
     email: string,
     phoneNumber: string,
     profilePhoto: File,
