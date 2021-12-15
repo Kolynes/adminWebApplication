@@ -34,19 +34,22 @@
         <p>Actions:</p>
         <v-btn
           rounded
+          text
           color="primary"
           elevation="0"
-          class="font-weight-bold text-capitalize"
+          class="font-weight-bold text-capitalize mb-2"
           @click="beginEditAgent(agent)"
         >
           <v-icon class="mr-2">mdi-lead-pencil</v-icon>
           Edit Agent
         </v-btn>
+        <br>
         <v-btn
           rounded
+          text
           color="red white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize"
           @click="deleteAgent(agent)"
         >
           <v-icon class="mr-2">mdi-delete</v-icon>

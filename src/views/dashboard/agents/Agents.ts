@@ -23,12 +23,8 @@ export default class Agents extends Mixins(TableMixin, AgentEditorMixin) impleme
       value: "id"
     },
     {
-      text: "First Name",
-      value: "firstName"
-    },
-    {
-      text: "Last Name",
-      value: "lastName"
+      text: "Name",
+      value: "name"
     },
     {
       text: "Email",

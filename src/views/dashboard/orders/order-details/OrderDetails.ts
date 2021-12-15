@@ -1,8 +1,10 @@
 import { ISelectAgent } from "@/components/select-agent/SelectAgent";
 import SelectAgent from "@/components/select-agent/SelectAgent.vue";
 import { IAdminAgentsClient, IAdminCustomersClient, IAdminOrdersClient } from "@/services/services";
+import EOrderTypes from "@/types/EOrderTypes";
 import EProductTypes from "@/types/EProductTypes";
 import EServices from "@/types/EServices";
+import IAgent from "@/types/IAgent";
 import IOrder from "@/types/IOrder";
 import IProduct from "@/types/IProduct";
 import IUser from "@/types/IUser";
@@ -34,12 +36,44 @@ export default class OrderDetails extends Vue {
 
   @service(EServices.adminAgent)
   agentClient!: IAdminAgentsClient;
-  
+
+  orderTypes = [
+    {
+      name: EOrderTypes.unassigned,
+      className: "orange orange--text lighten-5",
+    },
+    {
+      name: EOrderTypes.assigned,
+      className: "primary primary--text lighten-5",
+    },
+    {
+      name: EOrderTypes.accepted,
+      className: "green green--text lighten-5",
+    },
+    {
+      name: EOrderTypes.failed,
+      className: "red red--text lighten-5",
+    },
+    {
+      name: EOrderTypes.fulfilled,
+      className: "green green--text lighten-5",
+    },
+  ];
   loading = true;
   deleting = false;
   order: IOrder | null = null;
-  customer: IUser | null = null;
-  agent: IUser | null = null;
+
+  get customer(): IUser | null {
+    return this.order && this.order.transaction.user;
+  };
+
+  get agent(): IAgent | null {
+    return this.order && this.order.deliveryAgent;
+  };
+
+  getSelectedOrderTypeClassName() {
+    return this.orderTypes.find(element => element.name == this.order!.status)!.className
+  }
 
   productTypePlural(product: IProduct): string {
     return typeTextPlurals[product.productType];
@@ -51,33 +85,10 @@ export default class OrderDetails extends Vue {
 
   async getOrder() {
     const response = await this.ordersClient.getOrder(this.id);
-    if(response.status == 200) {
+    this.loading = false;
+    if(response.status == 200) 
       this.order = response.data;
-      this.getCustomer();
-    }
-    else {
-      this.loading = false;
-      toast({ message: response.errors!.summary });
-    }
-  }
-  
-  async getCustomer() {
-    const response = await this.customerClient.getCustomer(this.order!.customerId);
-    if(response.status == 200) {
-      this.customer = response.data;
-      this.getAgent();
-    }
-    else {
-      this.loading = false;
-      toast({ message: response.errors!.summary });
-    }
-  }
-
-  async getAgent() {
-    const response = await this.agentClient.getAgent(this.order!.customerId);
-    this.loading = false
-    if(response.status == 200)
-      this.agent = response.data;
+    else toast({ message: response.errors!.summary });
   }
 
   deleteOrder() {
@@ -96,10 +107,10 @@ export default class OrderDetails extends Vue {
   }
 
   async assignAgent() {
-    const agent: IUser | null = await this.selectAgent.getAgent();
+    const agent: IAgent | null = await this.selectAgent.getAgent();
     if(agent == null)
       return;
-    if(this.order!.agentId != null) {
+    if(this.agent != null) {
       const confirmation = await confirm({
         icon: "mdi-motormike",
         title: "Assign Delivery Agent",
@@ -108,7 +119,7 @@ export default class OrderDetails extends Vue {
       if(!confirmation)
         return;
       toast({ loading: true, message: "Unassigning agent" })
-      const response = await this.ordersClient.unassignOrderToAgent(this.order!.id, this.order!.agentId!);
+      const response = await this.ordersClient.unassignOrderToAgent(this.order!.id, this.agent!.id);
       if(response.status == 200)
         toast({ loading: true, message: `Order has been unassigned. Reassigning order...`});
       else {
@@ -120,7 +131,7 @@ export default class OrderDetails extends Vue {
     const response = await this.ordersClient.assignOrderToAgent(this.order!.id, agent.id);
     toast(false);
     if(response.status == 200) {
-      toast({ message: `Order has been assigned to ${agent.firstName} ${agent.lastName}`});
+      toast({ message: `Order has been assigned to ${agent.name}`});
       this.getOrder();
     }
     else toast({ message: response.errors!.summary })

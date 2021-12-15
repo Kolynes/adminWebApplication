@@ -25,7 +25,7 @@ export default class Products extends Mixins(TableMixin, ProductsEditorMixin) im
     },
     {
       text: "Vendor",
-      value: "organizationName"
+      value: "vendor"
     },
     {
       text: "Price",

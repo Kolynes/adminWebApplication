@@ -1,11 +1,19 @@
 <template>
   <v-container class="px-5">
-    <h1 class="display-1 font-weight-bold primary--text">
-      {{title}} 
-    </h1>
-    <p class="caption"> 
-      {{ new Date().toDateString() }} 
-    </p>
+    <v-layout>
+      <v-btn icon @click="$router.back()" v-if="showBack">
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+      <v-flex>
+        <h1 class="display-1 font-weight-bold primary--text">
+          {{title}} 
+        </h1>
+        <p class="caption"> 
+          {{ new Date().toDateString() }} 
+        </p>
+      </v-flex>
+    </v-layout>
+
     <slot name="subtitle" />
     <v-card class="mt-4">
       <v-card-title>
@@ -14,6 +22,7 @@
           <v-flex xs4>
             <v-text-field 
               outlined 
+              rounded
               dense 
               hide-details
               :placeholder="searchPlaceholder"
@@ -22,9 +31,12 @@
               v-model="searchStringSynced"
             />
           </v-flex>
+          <v-btn icon @click="refresh" class="ml-3">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
         </v-layout>
       </v-card-title>
-      <v-card-text>
+      <v-card-text style="position: relative">
         <custom-table 
           :items="items" 
           :headers="headers"
@@ -37,7 +49,7 @@
           </template>
         </custom-table>
       </v-card-text>
-      <v-card-title class="caption" v-if="items.length > 0">
+      <v-card-title class="caption my-0 pt-0" v-if="items.length > 0">
         <v-spacer/>
         <div class="mx-5">
           <v-select 
@@ -91,7 +103,6 @@ export default class TableView extends Vue {
 
   @Prop({
     type: String,
-    required: true,
     default: "Search"
   })
   searchPlaceholder!: string;
@@ -144,6 +155,12 @@ export default class TableView extends Vue {
   })
   previousPage!: Function;
 
+  @Prop({
+    type: Boolean,
+    default: false
+  })
+  showBack!: boolean;
+
   @PropSync("pageSize", {
     type: Number,
     required: true
@@ -160,6 +177,10 @@ export default class TableView extends Vue {
     type: String,
     required: true
   })
-  searchStringSynced!: boolean;
+  searchStringSynced!: string;  
+
+  refresh() {
+    this.$emit("refresh");
+  }
 }
 </script>

@@ -4,9 +4,10 @@ import JsonResponse from "@/utils/http/JsonResponse";
 import JsonResponseErrors from "@/utils/http/JsonResponseErrors";
 import Service, { serviceClass } from "@/utils/services/Service";
 import { service } from "@/utils/services/ServiceProvider";
+import IIndexableObject from "@/utils/types/IIndexableObject";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAdminOrdersClient } from "./clients";
+import { IAdminOrdersClient } from ".";
 
 @serviceClass(EServices.adminOrders)
 class AdminOrdersClient extends Service implements IAdminOrdersClient {
@@ -15,20 +16,25 @@ class AdminOrdersClient extends Service implements IAdminOrdersClient {
   private http!: IJsonResponseClient;
 
   async getOrders(
-    status: EOrderTypes, 
+    status: EOrderTypes | null, 
     query: string, 
     page: number = 1, 
     pageSize: number = 100
   ): Promise<IJsonResponse> {
     try {
+      let payload: IIndexableObject = {
+        query,
+        page,
+        size: pageSize,
+      };
+      if(status)
+        payload = {
+          ...payload,
+          status
+        } 
       return await this.http.get(
         "/admin/orders",
-        {
-          status,
-          query,
-          page,
-          size: pageSize
-        }
+        payload
       );
     } catch(e) {
       console.log(e);

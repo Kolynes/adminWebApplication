@@ -13,7 +13,7 @@ export interface IAuthClient extends Service {
 
   changeUserPassword(id: number, newPassword: string): Promise<IJsonResponse>;
 
-  logout(): Promise<IJsonResponse>;
+  logout(): Promise<boolean>;
 }
 
 export interface IAdminUsersClient extends Service {
@@ -192,7 +192,7 @@ export interface IAdminPractitionersClient extends Service {
 
 export interface IAdminOrdersClient extends Service {
   getOrders(
-    status: EOrderTypes,
+    status: EOrderTypes | null,
     query: string,
     page?: number,
     pageSize?: number,

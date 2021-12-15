@@ -17,17 +17,17 @@ export function when (timestamp: number) {
 }
 
 
-export function date (timestamp: number) {
+export function date (timestamp: number | string) {
   const date = new Date(timestamp)
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
 }
 
-export function datetime (timestamp: number) {
+export function datetime (timestamp: number | string) {
   const date = new Date(timestamp)
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours() < 10 ? ('0' + date.getHours()) : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
 }
 
-export function duration (timestamp: number) {
+export function duration (timestamp: number | string) {
   const date = new Date(timestamp)
   return [
     date.getFullYear() - 1970,

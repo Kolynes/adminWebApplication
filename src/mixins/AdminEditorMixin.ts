@@ -117,7 +117,6 @@ export default class AdminEditorMixin extends Vue {
     if(response.status == 200)  
       this.allPermissions = response.data;
     else toast({ message: response.errors!.summary});
-    console.log(this.allPermissions)
   }
 
   created(){

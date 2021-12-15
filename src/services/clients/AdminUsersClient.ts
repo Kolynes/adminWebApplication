@@ -5,7 +5,7 @@ import Service, { serviceClass } from "@/utils/services/Service";
 import { service } from "@/utils/services/ServiceProvider";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAdminUsersClient } from "./clients";
+import { IAdminUsersClient } from ".";
 
 @serviceClass(EServices.adminUsers)
 class AdminUsersClient extends Service implements IAdminUsersClient {
@@ -50,7 +50,7 @@ class AdminUsersClient extends Service implements IAdminUsersClient {
       console.log(e);
       return this.http.jsonResponseAdapter(
         undefined,
-        new JsonResponseErrors("Failed to delete users")
+        new JsonResponseErrors("Failed to delete user")
       );
     }
   }
@@ -80,7 +80,7 @@ class AdminUsersClient extends Service implements IAdminUsersClient {
       console.log(e);
       return this.http.jsonResponseAdapter(
         undefined,
-        new JsonResponseErrors("Failed to update users")
+        new JsonResponseErrors("Failed to update user")
       );
     }
   }
@@ -147,7 +147,7 @@ class AdminUsersClient extends Service implements IAdminUsersClient {
       console.log(e);
       return this.http.jsonResponseAdapter(
         undefined,
-        new JsonResponseErrors("Failed to enable users")
+        new JsonResponseErrors("Failed to get current admin")
       );
     }
   }

@@ -21,7 +21,7 @@ class MapsService extends Service implements IMapsService {
       element,
       {
         center: new this.google.maps.LatLng(7, 7),
-        zoom: 4
+        zoom: 18
       }
     );
     return map;

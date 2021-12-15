@@ -56,8 +56,8 @@ export default class OrganizationDetails extends Mixins(OrganizationsEditorMixin
 
   async showLocation() {
     this.locationMap = await this.mapsService.load(this.locationMapElement);
-    this.mapsService.panToCoordinates(this.locationMap, this.organization!.latitude, this.organization!.longitude);
-    this.mapsService.placeMarker(this.locationMap, this.organization!.latitude, this.organization!.longitude);
+    this.mapsService.panToCoordinates(this.locationMap, parseFloat(this.organization!.location.latitude), parseFloat(this.organization!.location.longitude));
+    this.mapsService.placeMarker(this.locationMap, parseFloat(this.organization!.location.latitude), parseFloat(this.organization!.location.longitude));
   }
   
   mounted() { 

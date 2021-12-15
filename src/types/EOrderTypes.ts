@@ -1,7 +1,9 @@
 enum EOrderTypes {
-  processing = "Processing",
-  cancelled = "Cancelled",
-  completed = "Completed"
+  unassigned = "UNASSIGNED",
+  accepted = "ACCEPTED",
+  assigned = "ASSIGNED",
+  fulfilled = "FULFILLED",
+  failed = "FAILED"
 }
 
 export default EOrderTypes;

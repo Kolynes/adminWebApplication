@@ -106,14 +106,14 @@ export default class OrganizationsEditorMixin extends Vue {
     this.name = organization.name;
     this.email =organization.email;
     this.phoneNumber = organization.phoneNumber;
-    this.address = organization.address;
+    this.address = organization.location.address;
     this.description = organization.description;
     this.selectedOrganization = organization.id;
     await this.toggleCreateOrganizationDialog(true);
-    this.setLocation(organization.latitude, organization.longitude)
+    this.setLocation(parseFloat(organization.location.latitude), parseFloat(organization.location.longitude))
     setTimeout(
       () => 
-        this.mapsService.panToCoordinates(this.map!, organization.latitude, organization.longitude),
+        this.mapsService.panToCoordinates(this.map!, parseFloat(organization.location.latitude), parseFloat(organization.location.longitude)),
       1000
     );
   }

@@ -14,7 +14,7 @@
       </h1>
     </v-row>
     <v-layout>
-      <v-flex>
+      <v-flex xs12 sm6>
         <div class="ml-4">
           <profile-photo
             :src="organization.profilePhoto"
@@ -27,8 +27,8 @@
           <p class="font-weight-bold caption mb-0">Phone Number</p>
           <p class="body-1">{{ organization.phoneNumber }}</p>
           <p class="font-weight-bold caption mb-0">Address</p>
-          <p class="body-1">{{ organization.address }}</p>
-          <p class="font-weight-bold caption mb-0">Descritpion</p>
+          <p class="body-1">{{ organization.location.address }}</p>
+          <p class="font-weight-bold caption mb-0">Description</p>
           <p class="body-1">{{ organization.description }}</p>
         </div>
       </v-flex>
@@ -36,31 +36,37 @@
         <p>Actions:</p>
         <v-btn
           rounded
+          text
           color="primary"
           elevation="0"
-          class="font-weight-bold text-capitalize"
+          class="font-weight-bold text-capitalize mb-2"
           @click="beginEditOrganization(organization)"
         >
           <v-icon class="mr-2">mdi-lead-pencil</v-icon>
           Edit Pharmacy
         </v-btn>
+        <br>
         <v-btn
           rounded
+          text
           color="red white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize mb-2"
           @click="deletePharmacy(organization)"
         >
           <v-icon class="mr-2">mdi-delete</v-icon>
           Delete Pharmacy
         </v-btn>
+        <br>
         <v-btn
           rounded
+          text
           color="primary white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize mb-2"
           :to="`/dashboard/pharmacies/products?organizationId=${organization.id}`"
         >
+          <v-icon class="mr-2">mdi-cart</v-icon>
           View Products
         </v-btn>
         <v-divider class="my-5" />

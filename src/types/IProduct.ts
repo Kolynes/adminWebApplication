@@ -1,13 +1,13 @@
 import EDrugTypes from "./EDrugTypes";
 import EProductTypes from "./EProductTypes";
+import IOrganization from "./IOrganization";
 
 export default interface IProduct {
   id: number;
   name: string;
-  organizationId: number;
-  organizationName: string;
+  organization: IOrganization;
   description: string;
-  image: string;
+  productImage: string;
   price: number;
   quantityInStock: number;
   dosage: string;

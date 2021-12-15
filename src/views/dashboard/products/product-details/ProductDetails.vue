@@ -20,43 +20,54 @@
     <v-layout>
       <v-flex>
         <div class="ml-4">
-          <profile-photo :src="product.image" width="300" @click="changeProductImage(product.id)"/>
-          <p class="font-weight-bold caption mb-0">{{ typeOfOrganization }}</p>
+          <profile-photo
+            :src="product.productImage"
+            width="300"
+            @click="changeProductImage(product.id)"
+          />
+          <p class="font-weight-bold caption mb-0 mt-5">
+            {{ typeOfOrganization }}
+          </p>
           <p class="body-1">
-            <router-link :to="`${organizationTypeRoute}/details?id=${id}`">
-              {{ product.organizationName }}
+            <router-link
+              :to="`${organizationTypeRoute}/details?id=${product.organization.id}`"
+            >
+              {{ product.organization.name }}
             </router-link>
           </p>
           <p class="font-weight-bold caption mb-0">Price</p>
           <p class="body-1">{{ product.price }}</p>
           <p class="font-weight-bold caption mb-0">Quantity in Stock</p>
           <p class="body-1">{{ product.quantityInStock }}</p>
-          <p class="font-weight-bold caption mb-0">Description</p>
-          <p class="body-1">{{ product.description }}</p>
         </div>
       </v-flex>
       <v-flex xs12 sm6>
-        <p>Actions:</p>
+        <p class="mb-2">Actions:</p>
         <v-btn
           rounded
+          text
           color="red white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize mb-1"
           @click="deleteProduct(product)"
         >
           <v-icon class="mr-2">mdi-delete</v-icon>
           Delete {{ typeText }}
         </v-btn>
+        <br />
         <v-btn
           rounded
+          text
           color="primary white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize"
           @click="beginEditProduct(product)"
         >
           <v-icon class="mr-2">mdi-lead-pencil</v-icon>
           Edit {{ typeText }}
         </v-btn>
+        <p class="font-weight-bold caption mb-0 mt-5">Description</p>
+        <p class="body-1">{{ product.description }}</p>
       </v-flex>
     </v-layout>
     <v-dialog v-model="createProductDialogVisible" persistent width="1000">
@@ -93,7 +104,7 @@
                     prepend-inner-icon="mdi-note-text"
                     v-model="description"
                     type="phone"
-                    :rules="[requiredLengthRule(20, 150)]"
+                    :rules="[requiredLengthRule(10)]"
                   />
                   <v-layout>
                     <v-flex xs6>
@@ -149,18 +160,12 @@
                   </v-btn>
                 </v-flex>
                 <v-flex xs6>
-                  <v-file-field
-                    outlined
-                    label="Image"
-                    v-model="image"
-                    :rules="[requiredRule]"
-                  />
                   <v-textarea
-                    label="dosage"
+                    label="Dosage"
                     outlined
                     prepend-inner-icon="mdi-note-text"
                     v-model="dosage"
-                    :rules="[requiredLengthRule(20, 150)]"
+                    :rules="[requiredLengthRule(10)]"
                     v-if="type == 'DRUG'"
                   />
                 </v-flex>
@@ -170,7 +175,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <file-getter ref="fileGetter"/>
+    <file-getter ref="fileGetter" />
   </v-container>
 </template>
 

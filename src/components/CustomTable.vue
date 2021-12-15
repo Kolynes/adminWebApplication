@@ -1,8 +1,7 @@
-<template>
-  <v-simple-table fixed-header :height="height" v-if="items.length > 0">
+<template>  <v-simple-table fixed-header :height="height" v-if="items.length > 0">
     <thead>
       <tr>
-        <td 
+        <th 
           v-for="(header, index) in headers" 
           :key="`header-${index}`"
         >
@@ -15,10 +14,15 @@
               {{ header.text }}
             </p>
           </slot>
-        </td>
+        </th>
+        <th>
+          <p class="text-left">
+            Actions
+          </p>
+        </th>
       </tr>
     </thead>
-    <tbody >
+    <tbody>
       <tr 
         v-for="(item, index) in items" 
         :key="`item-${index}`"

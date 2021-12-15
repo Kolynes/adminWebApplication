@@ -30,14 +30,18 @@ export default class JsonResponse implements IJsonResponse {
   
     static async createJsonResponse<T>(baseResponse?: Response, errors?: IJsonResponseErrors): Promise<JsonResponse> {
       if(baseResponse != null) {
-        const json: IJsonResponse = await baseResponse.json();
         let response = new JsonResponse(baseResponse);
-        response.data = json.data;
-        response.numberOfPages = json.numberOfPages;
-        response.nextPage = json.nextPage;
-        response.previousPage = json.previousPage;
-        response.errors = json.errors;
-        return response;
+        try {
+          const json: IJsonResponse = await baseResponse.json();
+          response.data = json.data;
+          response.numberOfPages = json.numberOfPages;
+          response.nextPage = json.nextPage;
+          response.previousPage = json.previousPage;
+          response.errors = json.errors;
+
+        } finally {
+          return response;
+        }
       }
       else {
         const response = new JsonResponse();

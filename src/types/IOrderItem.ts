@@ -1,5 +1,9 @@
 import IProduct from "./IProduct";
 
-export default interface IOrderItem extends IProduct {
-  quantity: number;
+export default interface IOrderItem {
+  id: number;
+  prescriptions: string[];
+  price: number;
+  product: IProduct;
+  quanitity: number;
 }

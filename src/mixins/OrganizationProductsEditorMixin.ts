@@ -35,7 +35,7 @@ const organizationTypeRoutes = {
 const AdminModule = namespace("AdminModule");
 
 @Component
-export default class ProductsEditorMixin extends Vue {
+export default class OrganizationProductsEditorMixin extends Vue {
   @Prop({
     type: String,
     default: EProductTypes.drug

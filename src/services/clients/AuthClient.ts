@@ -1,12 +1,11 @@
 import EServices from "@/types/EServices";
-import JsonResponse from "@/utils/http/JsonResponse";
 import JsonResponseErrors from "@/utils/http/JsonResponseErrors";
 import Service, { serviceClass } from "@/utils/services/Service";
 import { service } from "@/utils/services/ServiceProvider";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
 import { IStoreService } from "../services";
-import { IAuthClient } from "./clients";
+import { IAuthClient } from ".";
 
 @serviceClass(EServices.auth)
 class AuthClient extends Service implements IAuthClient {
@@ -60,17 +59,12 @@ class AuthClient extends Service implements IAuthClient {
     }
   }
 
-  async logout(): Promise<IJsonResponse> {
+  async logout(): Promise<boolean> {
     try {
-      const response = await this.http.post("/users/logout");
-      if(response.status == 200)
-        this.store.instance.commit("AdminModule/clear")
-      return response;
+      this.store.instance.commit("AdminModule/clear")
+      return true;
     } catch(e) {
-      return this.http.jsonResponseAdapter(
-        undefined,
-        new JsonResponseErrors("Failed to logout")
-      );
+      return false;
     }
   }
 }

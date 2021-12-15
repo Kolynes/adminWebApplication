@@ -32,23 +32,19 @@
       </p>
       <p class="subheading">Total: ₦{{ order.totalPrice }}</p>
       <v-chip
-        class="white--text mb-2"
-        :class="{
-          'primary primary--text lighten-4': order.status == 'Processing',
-          'green green--text lighten-4': order.status == 'Completed',
-          'red red--text lighten-4': order.status == 'Cancelled',
-        }"
+        class="mb-2 text-capitalize"
+        :class="getSelectedOrderTypeClassName()"
       >
-        {{ order.status }}
+        {{ order.status.toLowerCase() }}
       </v-chip>
       <br />
       <v-layout>
-        <v-flex xs12 sm6 md8>
+        <v-flex xs12 sm6>
           <v-hover v-for="(item, index) in order.orderItems" :key="index">
             <template #default="{ hover }">
-              <v-layout :class="{ 'grey lighten-4': hover, 'hoverable clickable': true }" @click="goToProduct(item)">
+              <v-layout :class="{ 'grey lighten-4': hover, 'hoverable clickable': true }" @click="goToProduct(item.product)">
                 <v-flex xs3>
-                  <v-img :src="item.image" />
+                  <v-img :src="item.product.productImage" />
                 </v-flex>
                 <v-flex>
                   <p class="title font-weight-bold mb-0">
@@ -68,11 +64,12 @@
           </v-hover>
         </v-flex>
         <v-flex>
-          <p class="subheading mb-0">Actions:</p>
+          <p class="subheading mb-2">Actions:</p>
           <v-btn
             big
+            text
             color="green"
-            class="white--text font-weight-bold text-capitalize mb-5 mr-2"
+            class="white--text font-weight-bold text-capitalize mb-1 mr-2"
             rounded
             elevation="0"
             @click="assignAgent"
@@ -80,10 +77,12 @@
             <v-icon class="mr-2">mdi-motorbike</v-icon>
             Assign to agent
           </v-btn>
+          <br>
           <v-btn
             big
+            text
             color="red"
-            class="white--text font-weight-bold text-capitalize mb-5"
+            class="white--text font-weight-bold text-capitalize mb-1"
             rounded
             elevation="0"
             @click="deleteOrder"
@@ -92,9 +91,9 @@
             <v-icon class="mr-2">mdi-delete</v-icon>
             Delete
           </v-btn>
-          <v-card class="mb-5">
+          <v-card class="my-5">
             <v-card-title class="body-1">Delivery</v-card-title>
-            <v-card-text>
+            <v-card-text v-if="agent != null">
               <p class="caption mb-1">Agent:</p>
               <v-layout>
                 <v-avatar

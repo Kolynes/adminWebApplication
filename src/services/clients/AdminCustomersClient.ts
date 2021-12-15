@@ -6,7 +6,7 @@ import { service } from "@/utils/services/ServiceProvider";
 import EContentTypes from "@/utils/types/EContentTypes";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAdminCustomersClient } from "./clients";
+import { IAdminCustomersClient } from ".";
 
 @serviceClass(EServices.adminCustomers)
 export default class AdminCustomersClient extends Service implements IAdminCustomersClient {
@@ -78,7 +78,7 @@ export default class AdminCustomersClient extends Service implements IAdminCusto
           gender,
           age
         },
-        {},
+        undefined,
         EContentTypes.multipart
       );
     } catch(e) {

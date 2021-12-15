@@ -5,7 +5,7 @@ import { service } from "@/utils/services/ServiceProvider";
 import EContentTypes from "@/utils/types/EContentTypes";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAdminAgentsClient } from "./clients";
+import { IAdminAgentsClient } from ".";
 
 @serviceClass(EServices.adminAgent)
 export default class AdminAgentsClient extends Service implements IAdminAgentsClient {
@@ -92,7 +92,7 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
         `/admin/users/agents/${id}`,
         {},
         {
-          profilePhoto: [profilePhoto]
+          file: [profilePhoto]
         }
       );
     } catch(e) {
@@ -125,7 +125,7 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
           password,
         },
         {
-          profilePhoto: [profilePhoto]
+          file: [profilePhoto]
         }
       );
     } catch(e) {

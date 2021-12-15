@@ -13,8 +13,16 @@
       :previousPage="previousPage"
       :pageSize.sync="pageSize"
       :page.sync="page"
+      show-back
+      @refresh="search"
     >
       <template #item:id="{ item }"> #{{ item.id }} </template>
+      <template #item:name="{ item }">
+        <v-avatar class="my-1 mr-1">
+          <img :src="item.image"/>
+        </v-avatar>
+        {{item.name}}
+      </template>
 
       <template #empty-state>
         <v-empty-state

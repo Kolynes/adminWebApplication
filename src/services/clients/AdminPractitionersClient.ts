@@ -5,7 +5,7 @@ import Service, { serviceClass } from "@/utils/services/Service";
 import { service } from "@/utils/services/ServiceProvider";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAdminPractitionersClient } from "./clients";
+import { IAdminPractitionersClient } from ".";
 
 @serviceClass(EServices.adminPractitioners)
 class AdminPractitionersClient extends Service implements IAdminPractitionersClient {

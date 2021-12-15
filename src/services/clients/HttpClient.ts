@@ -13,19 +13,19 @@ class HttpClient extends JsonResponseClient implements IJsonResponseClient {
   store!: IStoreService;
 
   initState() {
-    this.baseUrl = "http://buymedixbackend.herokuapp.com/api/v1";
+    this.baseUrl = "https://buymedixbackend.herokuapp.com/api/v1";
     this.headers = {
-      Authorization: this.getToken
+      Authorization: () => this.getToken()
     },
-      this.jsonResponseAdapter = JsonResponse.createJsonResponse;
-    this.debug = true;
+    this.debug = false;
     this.facade = networkFacade;
+    this.jsonResponseAdapter = JsonResponse.createJsonResponse;
     super.initState();
   }
 
   async getToken(): Promise<string> {
     return this.store.adminModule.admin !== null && this.store.adminModule.admin !== undefined
-      ? this.store.adminModule.admin.token
+      ? `Bearer ${this.store.adminModule.admin.token}`
       : "";
   }
 }

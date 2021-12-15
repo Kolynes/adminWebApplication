@@ -13,6 +13,7 @@
       :previousPage="previousPage"
       :pageSize.sync="pageSize"
       :page.sync="page"
+      @refresh="search"
     >
       <template #subtitle>
         <v-btn

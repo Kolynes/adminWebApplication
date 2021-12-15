@@ -50,34 +50,39 @@
         </div>
       </v-flex>
       <v-flex xs12 sm6>
-        <p>Actions:</p>
+        <p class="mb-2">Actions:</p>
         <v-btn
           rounded
+          text
           color="primary"
           elevation="0"
-          class="font-weight-bold text-capitalize"
+          class="font-weight-bold text-capitalize mb-2"
           @click="beginEditAdmin(admin)"
         >
           <v-icon class="mr-2">mdi-lead-pencil</v-icon>
           Edit Admin
         </v-btn>
+        <br>
         <v-btn
           rounded
+          text
           :color="admin.active? 'red' : 'green'"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3 white--text"
+          class="font-weight-bold text-capitalize mb-2 white--text"
           @click="admin.active? disableAdmin(admin) : enableAdmin(admin)"
         >
-          <v-icon class="mr-2" color="white" v-if="admin.active">mdi-close</v-icon>
-          <v-icon class="mr-2" color="white" v-else>mdi-check</v-icon>
+          <v-icon class="mr-2" v-if="admin.active">mdi-close</v-icon>
+          <v-icon class="mr-2" v-else>mdi-check</v-icon>
           <span v-if="admin.active">Disable Admin</span>
           <span v-else>Enable Admin</span>
         </v-btn>
+        <br>
         <v-btn
           rounded
+          text
           color="red white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize mb-2"
           @click="deleteAdmin(admin)"
         >
           <v-icon class="mr-2">mdi-delete</v-icon>

@@ -13,28 +13,24 @@
       :previousPage="previousPage"
       :pageSize.sync="pageSize"
       :page.sync="page"
+      @refresh="search"
     >
       <template #subtitle>
         <v-chip 
-          @click="setOrderType('Processing')" 
+          @click="setOrderType(null)" 
           class="text-capitalize font-weight-bold mx-1"
-          :class="{'primary primary--text lighten-4': orderType == 'Processing'}"
+          :class="{primary: selectedOrderType == null}"
         >
-          Processing
+          All
         </v-chip>
         <v-chip 
-          @click="setOrderType('Cancelled')" 
+          v-for="(orderType, index) in orderTypes"
+          :key="index"
+          @click="setOrderType(orderType.name)" 
           class="text-capitalize font-weight-bold mx-1"
-          :class="{'red red--text lighten-4': orderType == 'Cancelled'}"
+          :class="{[orderType.className]: selectedOrderType == orderType.name}"
         >
-          Cancelled
-        </v-chip>
-        <v-chip 
-          @click="setOrderType('Completed')" 
-          class="text-capitalize font-weight-bold mx-1"
-          :class="{'green green--text lighten-4': orderType == 'Completed'}"
-        >
-          Completed
+          {{orderType.name.toLowerCase()}}
         </v-chip>
       </template>
 
@@ -42,21 +38,26 @@
         #{{item.id}}
       </template>
 
+      <template #item:deliveryAddress="{ item }">
+        {{item.destination.address}}
+      </template>
+
+      <template #item:createdOnDate="{ item }">
+        {{datetime(item.createdOnDate)}}
+      </template>
+
       <template #item:customerId="{ item }">
-        <router-link :to="`/dashboard/customers/details?id=${item.customerId}`">
-          #{{item.customerId}}
+        <router-link :to="`/dashboard/customers/details?id=${getUser(item).id}`">
+          {{getUser(item).fullName}}
         </router-link>
       </template>
 
       <template #item:status="{ item }">
         <v-chip
-          :class="{
-            'primary primary--text lighten-4': item.status == 'Processing',
-            'green green--text lighten-4': item.status == 'Completed',
-            'red red--text lighten-4': item.status == 'Cancelled',
-          }"
+          class="text-capitalize"
+          :class="orderTypes.find(elem => elem.name == item.status).className"
         >
-          {{item.status}}
+          <span class="text-capitalize">{{item.status.toLowerCase()}}</span>
         </v-chip>
       </template>
 

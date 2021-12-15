@@ -13,6 +13,7 @@
       :previousPage="previousPage"
       :pageSize.sync="pageSize"
       :page.sync="page"
+      @refresh="search"
     >
       <template #subtitle>
         <v-btn
@@ -22,12 +23,21 @@
           elevation="0"
           @click="toggleCreateOrganizationDialog"
         >
-          <v-icon class="mr-2">{{icon}}</v-icon>
-          Create {{typeText}}
+          <v-icon class="mr-2">{{ icon }}</v-icon>
+          Create {{ typeText }}
         </v-btn>
       </template>
 
       <template #item:id="{ item }"> #{{ item.id }} </template>
+
+      <template #item:name="{ item }">
+        <v-avatar class="my-1 mr-1">
+          <img :src="item.profilePhoto" />
+        </v-avatar>
+        {{ item.name }}
+      </template>
+
+      <template #item:address="{ item }">{{ item.location.address }}</template>
 
       <template #actions="{ item }">
         <v-list-item @click="deleteOrganization(item)">
@@ -52,9 +62,9 @@
       <v-card v-if="toggleCreateOrganizationDialog">
         <v-card-title>
           <span class="body-1" v-if="selectedOrganization == null"
-            >Create New {{typeText}}</span
+            >Create New {{ typeText }}</span
           >
-          <span class="body-1" v-else>Edit {{typeText}}</span>
+          <span class="body-1" v-else>Edit {{ typeText }}</span>
           <v-spacer />
           <v-btn icon @click="toggleCreateOrganizationDialog">
             <v-icon>mdi-close</v-icon>
@@ -102,15 +112,13 @@
                     type="phone"
                     :rules="[requiredLengthRule(10)]"
                   />
-                  <v-text-field
-                    label="Address"
+                  <v-file-field
+                    label="Profile Photo"
                     outlined
-                    prepend-inner-icon="mdi-map-marker"
-                    v-model="address"
-                    type="address"
-                    :rules="[requiredLengthRule(2)]"
+                    v-model="profilePhoto"
+                    :rules="[requiredRule]"
+                    v-if="!selectedOrganization"
                   />
-                 
                   <v-password-field
                     label="Password"
                     outlined
@@ -119,36 +127,27 @@
                     :rules="[requiredLengthRule(6)]"
                     v-if="!selectedOrganization"
                   />
-                  <v-btn
-                    class="text-capitalize font-weight-bold"
-                    color="primary"
-                    rounded
-                    elevation="0"
-                    type="submit"
-                    :loading="creatingOrganization"
-                  >
-                    {{ selectedOrganization != null ? "Edit" : "Create" }}
-                    {{typeText}}
-                  </v-btn>
                 </v-flex>
                 <v-flex xs6>
-                   <v-file-field
-                    label="Profile Photo"
-                    outlined
-                    v-model="profilePhoto"
-                    :rules="[requiredRule]"
-                    v-if="!selectedOrganization"
-                  />
                   <p class="title">
                     <v-icon>mdi-map</v-icon>
-                    Select location on map
+                    Location
                   </p>
+                  <v-text-field
+                    label="Address"
+                    outlined
+                    prepend-inner-icon="mdi-map-marker"
+                    v-model="address"
+                    type="address"
+                    :rules="[requiredLengthRule(2)]"
+                  />
                   <v-layout>
                     <v-flex xs6>
                       <v-text-field
                         label="latitude"
                         outlined
                         readonly
+                        dense
                         v-model="latitude"
                         type="address"
                         :rules="[requiredRule]"
@@ -159,6 +158,7 @@
                         label="longitude"
                         outlined
                         readonly
+                        dense
                         v-model="longitude"
                         type="address"
                         :rules="[requiredRule]"
@@ -168,6 +168,17 @@
                   <div ref="mapElement" style="height: 400px"></div>
                 </v-flex>
               </v-layout>
+              <v-btn
+                class="text-capitalize font-weight-bold"
+                color="primary"
+                rounded
+                elevation="0"
+                type="submit"
+                :loading="creatingOrganization"
+              >
+                {{ selectedOrganization != null ? "Edit" : "Create" }}
+                {{ typeText }}
+              </v-btn>
             </v-form>
           </v-container>
         </v-card-text>

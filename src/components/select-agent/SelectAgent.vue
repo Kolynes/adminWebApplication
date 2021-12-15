@@ -35,14 +35,15 @@
                     color="primary white--text" 
                     class="font-weight-bold"
                   >
-                    {{item.firstName[0].toUpperCase()}}
+                    <img :src="item.profilePhoto" v-if="item.profilePhoto"/>
+                    <span v-else>{{item.name[0].toUpperCase()}}</span>
                   </v-avatar>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>{{item.firstName}} {{item.lastName}}</v-list-item-title>
+                  <v-list-item-title>{{item.name}}</v-list-item-title>
                   <v-list-item-subtitle>
                     <v-icon size="15">mdi-map-marker</v-icon>
-                    {{item.location}}
+                    {{item.location.address}}
                   </v-list-item-subtitle>
                   <v-list-item-subtitle>
                     <v-icon size="15">mdi-phone</v-icon>

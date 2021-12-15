@@ -1,7 +1,7 @@
 import EOrderTypes from "@/types/EOrderTypes";
-import { Component, Ref, Mixins } from "vue-property-decorator"
+import { Component, Ref, Mixins, Watch } from "vue-property-decorator"
 import IOrder from "@/types/IOrder";
-import ServiceProvider, { service } from "@/utils/services/ServiceProvider";
+import { service } from "@/utils/services/ServiceProvider";
 import { IAdminOrdersClient } from "@/services/services";
 import EServices from "@/types/EServices";
 import IUser from "@/types/IUser";
@@ -9,6 +9,10 @@ import SelectAgent from "@/components/select-agent/SelectAgent.vue";
 import TableView from "@/components/TableView.vue";
 import { ISelectAgent } from "@/components/select-agent/SelectAgent";
 import TableMixin, { ISearchResults, ITableView } from "@/mixins/TableMixin";
+import { datetime } from "@/utils/time";
+import ITransaction from "@/types/ITransaction";
+import IAgent from "@/types/IAgent";
+
 
 @Component({
    components: {
@@ -20,8 +24,31 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
   @service(EServices.adminOrders)
   ordersClient!: IAdminOrdersClient;
   
-  orderType = EOrderTypes.processing;
+  selectedOrderType: EOrderTypes | null = null;
   showAgentDialog = false;
+
+  orderTypes = [
+    {
+      name: EOrderTypes.unassigned,
+      className: "orange orange--text lighten-5",
+    },
+    {
+      name: EOrderTypes.assigned,
+      className: "primary primary--text lighten-5",
+    },
+    {
+      name: EOrderTypes.accepted,
+      className: "green green--text lighten-5",
+    },
+    {
+      name: EOrderTypes.failed,
+      className: "red red--text lighten-5",
+    },
+    {
+      name: EOrderTypes.fulfilled,
+      className: "green green--text lighten-5",
+    },
+  ];
 
   headers = [
     {
@@ -30,10 +57,10 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
     },
     {
       text: "Date",
-      value: "date"
+      value: "createdOnDate"
     },
     {
-      text: "Customer ID",
+      text: "Customer",
       value: "customerId"
     },
     {
@@ -50,19 +77,36 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
   @Ref()
   selectAgent!: ISelectAgent;
 
+  datetime = datetime;
+
   setOrderType(type: EOrderTypes) {
-    this.orderType = type;
+    this.selectedOrderType = type;
+  }
+
+  getSelectedOrderTypeClassName() {
+    this.orderTypes.find(element => element.name == this.selectedOrderType)!.className
   }
 
   itemClicked(order: IOrder) {
     this.$router.push(`/dashboard/orders/details?id=${order.id}`)
   }
 
+  getTransaction(order: IOrder): ITransaction {
+    return order.transaction
+  }
+
+  getUser(order: IOrder): IUser | null {
+    let transaction = this.getTransaction(order);
+    if(transaction !== null)
+      return transaction.user;
+    else return {} as IUser;
+  }
+
   async assignAgent(order: IOrder) {
-    const agent: IUser | null = await this.selectAgent.getAgent();
+    const agent: IAgent | null = await this.selectAgent.getAgent();
     if(agent == null)
       return;
-    if(order.agentId != null || order.agentId != undefined) {
+    if(order.deliveryAgent != null) {
       const confirmation = await confirm({
         icon: "mdi-motormike",
         title: "Assign Delivery Agent",
@@ -71,7 +115,7 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
       if(!confirmation)
         return;
       toast({ loading: true, message: "Unassigning agent" })
-      const response = await this.ordersClient.unassignOrderToAgent(order.id, order.agentId);
+      const response = await this.ordersClient.unassignOrderToAgent(order.id, order.deliveryAgent!.id);
       if(response.status == 200)
         toast({ loading: true, message: `Order has been unassigned. Reassigning order...`});
       else {
@@ -83,7 +127,7 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
     const response = await this.ordersClient.assignOrderToAgent(order.id, agent.id);
     toast(false);
     if(response.status == 200)
-      toast({ message: `Order has been assigned to ${agent.firstName} ${agent.lastName}`});
+      toast({ message: `Order has been assigned to ${agent.name}`});
     else toast({ message: response.errors!.summary })
   }
 
@@ -104,7 +148,7 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
 
   async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IOrder>> {
     const response = await this.ordersClient.getOrders(
-      this.orderType, 
+      this.selectedOrderType!, 
       searchString, 
       page, 
       pageSize
@@ -122,5 +166,10 @@ export default class Orders extends Mixins(TableMixin) implements ITableView<IOr
         numberOfPages: this.numberOfPages
       }
     }
+  }
+
+  @Watch("selectedOrderType")
+  onSelectedOrderTypeChanged() {
+    this.search();
   }
 }

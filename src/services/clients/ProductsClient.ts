@@ -7,7 +7,7 @@ import { service } from "@/utils/services/ServiceProvider";
 import EContentTypes from "@/utils/types/EContentTypes";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IProductsClient } from "./clients";
+import { IProductsClient } from ".";
 
 
 @serviceClass(EServices.products)
@@ -147,7 +147,7 @@ class ProductsClient extends Service implements IProductsClient {
       console.log(e);
       return this.http.jsonResponseAdapter(
         undefined,
-        new JsonResponseErrors("Failed to create product")
+        new JsonResponseErrors("Failed to update product")
       );
     }
   }
@@ -175,7 +175,7 @@ class ProductsClient extends Service implements IProductsClient {
     productType: string
   ): Promise<IJsonResponse> {
     try {
-      return await this.http.post(
+      return await this.http.patch(
         `/products/update/${id}`,
         {
           name,
@@ -185,9 +185,7 @@ class ProductsClient extends Service implements IProductsClient {
           dosage,
           drugType,
           productType
-        },
-        {},
-        EContentTypes.multipart
+        }
       );
     } catch(e) {
       console.log(e);

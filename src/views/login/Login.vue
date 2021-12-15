@@ -1,53 +1,47 @@
 <template>
   <v-app>
     <v-content>
-      <v-container 
-        fill-height 
-        align-center 
-        justify-center
-      >
+      <v-container fill-height align-center justify-center>
         <div class="text-center">
           <img src="../../assets/images/logoAndName.svg" />
-          <h3 class="title my-5">
-            Admin Sign In
-          </h3>
-          <v-form 
-            ref="loginForm" 
-            @submit.prevent="login" 
-            class="text-left"
-          >
-            <p class="subheading mb-0">
-              Email Address
-            </p>
-            <v-text-field 
-              outlined 
+          <h3 class="title my-5">Sign In</h3>
+          <v-form ref="loginForm" @submit.prevent="login" class="text-left">
+            <v-text-field
+              outlined
               dense
               :rules="[emailRule]"
-              class="mb-1" 
+              label="Email Address"
+              prepend-inner-icon="mdi-email"
+              class="mb-1"
+              v-model="email"
             />
-            <v-layout justify-space-between>
-              <p class="subheading mb-0">
-                Password
-              </p>
-              <router-link to="/forgot_password">
-                Forgot Password 
-              </router-link>
-            </v-layout>
-            <v-password-field 
-              outlined 
+            <v-password-field
+              outlined
               dense
+              label="Password"
+              prepend-inner-icon="mdi-lock"
               :rules="[requiredRule]"
-              class="mb-5" 
+              v-model="password"
             />
-            <v-btn 
-              block 
+            <v-btn
+              block
               color="primary"
               :loading="signingIn"
               type="submit"
-              class="font-weight-bold text-capitalize"
+              class="font-weight-bold text-capitalize mt-3"
               elevation="0"
-            > 
-              Sign In 
+            >
+              Sign In
+            </v-btn>
+            <v-btn
+              block
+              text
+              color="primary"
+              class="font-weight-bold text-capitalize mt-3"
+              elevation="0"
+              to="/forgot_password"
+            >
+              Forgot Password
             </v-btn>
           </v-form>
         </div>

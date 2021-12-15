@@ -13,6 +13,7 @@
       :previousPage="previousPage"
       :pageSize.sync="pageSize"
       :page.sync="page"
+      @refresh="search"
     >
       <template #subtitle>
         <v-btn
@@ -29,6 +30,12 @@
       </template>
 
       <template #item:id="{ item }"> #{{ item.id }} </template>
+      <template #item:name="{ item }"> 
+        <v-avatar class="my-1 mr-1">
+          <img :src="item.profilePhoto"/>
+        </v-avatar>
+        {{item.firstName}} {{item.lastName}}
+      </template>
 
       <template #item:available="{ item }">
         <v-icon color="green" v-if="item.available">mdi-check</v-icon>

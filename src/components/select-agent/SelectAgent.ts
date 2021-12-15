@@ -1,9 +1,9 @@
 import { IAdminAgentsClient } from "@/services/services";
 import EServices from "@/types/EServices";
-import IUser from "@/types/IUser";
-import { service } from "@/utils/services/ServiceProvider";
+import ServiceProvider from "@/utils/services/ServiceProvider";
 import { Vue, Component, Watch } from "vue-property-decorator";
 import VScrollView from "@/vuetify-extensions/VScrollView.vue";
+import IAgent from "@/types/IAgent";
 
 interface ILoaderResponse<T> {
   items: T[];
@@ -11,7 +11,7 @@ interface ILoaderResponse<T> {
 }
 
 export interface ISelectAgent {
-  getAgent(): Promise<IUser>;
+  getAgent(): Promise<IAgent>;
 }
 
 @Component({
@@ -26,21 +26,19 @@ export default class SelectAgent extends Vue {
   searching = false;
   searchTimeout: number | null = null;
   agentResolve: Function | null = null;
+  agentClient = ServiceProvider.getInstance().getService<IAdminAgentsClient>(EServices.adminAgent);
 
-  @service(EServices.adminAgent)
-  agentClient!: IAdminAgentsClient;
-
-  async getAgent(): Promise<IUser> {
+  async getAgent(): Promise<IAgent> {
     this.showDialog = true;
-    return new Promise<IUser>((resolve) => {
+    return new Promise<IAgent>((resolve) => {
       this.agentResolve = resolve;
-    }).then((user: IUser) => {
+    }).then((user: IAgent) => {
       this.showDialog = false;
       return user;
     });
   }
 
-  async loadAgents(page: number): Promise<ILoaderResponse<IUser>> {
+  async loadAgents(page: number): Promise<ILoaderResponse<IAgent>> {
     this.searching = true;
     const response = await this.agentClient.getActiveAgents(
       this.searchString || "",

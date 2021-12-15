@@ -3,7 +3,7 @@ import TableView from "@/components/TableView.vue";
 import TableMixin, { ISearchResults, ITableView } from "@/mixins/TableMixin";
 import IProduct from "@/types/IProduct";
 import VFileField from "@/vuetify-extensions/VFileField.vue";
-import OrganizationProductsEditorMixin from "@/mixins/OrganizationProductsEditorMixin";
+import ProductsEditorMixin from "@/mixins/ProductsEditorMixin";
 import IOrganization from "@/types/IOrganization";
 import { service } from "@/utils/services/ServiceProvider";
 import EServices from "@/types/EServices";
@@ -15,7 +15,7 @@ import { IAdminOrganizationsClient } from "@/services/services";
     VFileField,
   }
 })
-export default class OrganizationProducts extends Mixins(TableMixin, OrganizationProductsEditorMixin) implements ITableView<IProduct> {
+export default class OrganizationProducts extends Mixins(TableMixin, ProductsEditorMixin) implements ITableView<IProduct> {
   @Prop({
     type: Number,
     required: true

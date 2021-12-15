@@ -29,19 +29,22 @@
         <p>Actions:</p>
         <v-btn
           rounded
+          text
           color="red white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize mb-2"
           @click="deleteRide(ride)"
         >
           <v-icon class="mr-2">mdi-delete</v-icon>
           Delete Ride
         </v-btn>
+        <br>
         <v-btn
           rounded
+          text
           color="primary white--text"
           elevation="0"
-          class="font-weight-bold text-capitalize ml-3"
+          class="font-weight-bold text-capitalize"
           @click="beginEditRide(ride)"
         >
           <v-icon class="mr-2">mdi-lead-pencil</v-icon>

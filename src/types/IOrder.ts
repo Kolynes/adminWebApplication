@@ -1,15 +1,17 @@
 import EOrderTypes from "./EOrderTypes";
+import IAgent from "./IAgent";
+import ILocation from "./ILocation";
 import IOrderItem from "./IOrderItem";
+import ITransaction from "./ITransaction";
 
 export default interface IOrder {
   id: number;
-  date: string;
+  createdOnDate: string | Date;
   status: EOrderTypes;
-  prescriptionUrl?: string;
   totalPrice: number;
   orderItems: IOrderItem[];
-  trackingNumber: string;
-  deliveryAddress: string;
-  agentId: number | null;
-  customerId: number;
+  destination: ILocation;
+  deliveryAgent: IAgent | null;
+  transaction: ITransaction;
+  customerSignature: string;
 }

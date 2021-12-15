@@ -1,6 +1,6 @@
 <template>
   <div class="profilePhoto" @click="onClick">
-    <v-img :src="src" width="300" class="image"/>
+    <v-img :src="src" width="300" height="300" class="image"/>
     <div class="overlay">
       <v-icon color="white" size="100">camera</v-icon>
       <p>Click to change photo</p>

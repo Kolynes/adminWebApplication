@@ -1,6 +1,6 @@
 enum ERoleTypes {
   admin = "ADMIN",
-  superAdmin = "SUPER_ADMIN"
+  superAdmin = "SUPERADMIN"
 }
 
 export default ERoleTypes;

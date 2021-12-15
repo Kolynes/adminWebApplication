@@ -5,7 +5,7 @@ import { service } from "@/utils/services/ServiceProvider";
 import EContentTypes from "@/utils/types/EContentTypes";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAdminRidesClient } from "./clients";
+import { IAdminRidesClient } from ".";
 
 @serviceClass(EServices.adminRides)
 class AdminRidesClient extends Service implements IAdminRidesClient {

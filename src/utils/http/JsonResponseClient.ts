@@ -26,10 +26,13 @@ export default class JsonResponseClient extends Service implements IJsonResponse
         return this.facade[url.split("?")[0]];
     }
     const processedHeaders = <IIndexableObject>{};
-    for (var key in this.headers)
+    for (var key in this.headers) {
       if (this.headers[key] instanceof Function)
         processedHeaders[key] = await this.headers[key]();
       else processedHeaders[key] = this.headers[key];
+      if(!processedHeaders[key])
+        delete processedHeaders[key];
+    }
     const response = await fetch(this.buildUrl(url), {
       method,
       headers: processedHeaders,
@@ -63,7 +66,7 @@ export default class JsonResponseClient extends Service implements IJsonResponse
 
   private buildUrl(url: string) {
     let reqURL;
-    if (this.baseUrl) reqURL = new URL(url, this.baseUrl);
+    if (this.baseUrl) reqURL = new URL(`${this.baseUrl}${url}`);
     else reqURL = new URL(url);
     return reqURL.href;
   }
@@ -71,7 +74,6 @@ export default class JsonResponseClient extends Service implements IJsonResponse
   public get(url: string, query: IIndexableObject = {}): Promise<IJsonResponse> {
     const params = new URLSearchParams(query);
     let reqUrl;
-    console.log(url)
     if (url.includes("?")) reqUrl = `${url}&${params.toString()}`;
     else reqUrl = `${url}?${params.toString()}`;
     return this.exec(reqUrl, "GET",);
@@ -96,10 +98,10 @@ export default class JsonResponseClient extends Service implements IJsonResponse
   }
 
   public put(url: string, data?: IIndexableObject, contentType?: EContentTypes): Promise<IJsonResponse> {
-    return this.exec(url, "PUT", data, {}, contentType);
+    return this.exec(url, "PUT", data, undefined, contentType);
   }
 
   public delete(url: string, data?: IIndexableObject, contentType?: EContentTypes): Promise<IJsonResponse> {
-    return this.exec(url, "DELETE", data, {}, contentType);
+    return this.exec(url, "DELETE", data, undefined, contentType);
   }
 }

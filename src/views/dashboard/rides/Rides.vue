@@ -13,6 +13,7 @@
       :previousPage="previousPage"
       :pageSize.sync="pageSize"
       :page.sync="page"
+      @refresh="search"
     >
       <template #subtitle>
         <v-btn
@@ -28,6 +29,12 @@
         </v-btn>
       </template>
       <template #item:id="{ item }"> #{{ item.id }} </template>
+      <template #item:name="{ item }">
+        <v-avatar class="my-1 mr-1">
+          <img :src="item.photo"/>
+        </v-avatar>
+        {{item.name}}
+      </template>
 
       <template #actions="{ item }">
         <v-list-item @click="deleteRide(item)">
