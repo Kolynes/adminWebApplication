@@ -1,13 +1,11 @@
-<template>  <v-simple-table fixed-header :height="height" v-if="items.length > 0">
+<template>
+  <v-simple-table fixed-header :height="height" v-if="items.length > 0">
     <thead>
       <tr>
-        <th 
-          v-for="(header, index) in headers" 
-          :key="`header-${index}`"
-        >
-          <slot 
-            :name="`header:${header.value}`" 
-            :header="header" 
+        <th v-for="(header, index) in headers" :key="`header-${index}`">
+          <slot
+            :name="`header:${header.value}`"
+            :header="header"
             :index="index"
           >
             <p class="text-left">
@@ -16,46 +14,33 @@
           </slot>
         </th>
         <th>
-          <p class="text-left">
-            Actions
-          </p>
+          <p class="text-left">Actions</p>
         </th>
       </tr>
     </thead>
     <tbody>
-      <tr 
-        v-for="(item, index) in items" 
+      <tr
+        v-for="(item, index) in items"
         :key="`item-${index}`"
         @click="clickItem(item, index)"
         style="cursor: pointer"
       >
-        <td 
-          v-for="(header, index2) in headers" 
-          :key="`col-${index2}`"
-        >
-          <slot 
-            :name="`item:${header.value}`" 
-            :item="item" 
-            :index="index2"
-          >
+        <td v-for="(header, index2) in headers" :key="`col-${index2}`">
+          <slot :name="`item:${header.value}`" :item="item" :index="index2">
             {{ item[header.value] }}
           </slot>
         </td>
         <td style="width: 0px">
-          <v-menu offset-y="30">
+          <v-menu offset-y>
             <template #activator="{ on, attrs }">
-              <v-btn 
-                icon 
-                v-on="on" 
-                v-bind="attrs"
-              >
+              <v-btn icon v-on="on" v-bind="attrs">
                 <v-icon> mdi-dots-vertical </v-icon>
               </v-btn>
             </template>
             <v-list>
               <slot name="actions" :item="item">
                 <v-list-item>
-                  <p class="text-center caption"> No Actions </p>
+                  <p class="text-center caption">No Actions</p>
                 </v-list-item>
               </slot>
             </v-list>
@@ -82,12 +67,12 @@ import VEmptyState from "../vuetify-extensions/VEmptyState.vue";
 
 @Component({
   components: {
-    VEmptyState
-  }
+    VEmptyState,
+  },
 })
 export default class CustomTable extends Vue {
   @Prop({
-    default: () => []
+    default: () => [],
   })
   readonly items!: any[];
 
@@ -96,18 +81,18 @@ export default class CustomTable extends Vue {
 
   @Prop({
     default: "60vh",
-    type: String
+    type: String,
   })
   readonly height!: string;
 
   @Prop({
     default: false,
-    type: Boolean
+    type: Boolean,
   })
   loading!: boolean;
 
   clickItem(item: any) {
-    this.$emit("click-item", item)
+    this.$emit("click-item", item);
   }
 }
 </script>

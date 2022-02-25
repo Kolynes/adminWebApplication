@@ -1,6 +1,5 @@
-import { IAdminPractitionersClient } from "@/services/services";
-import EPractitionerTypes from "@/types/EPractitionerTypes";
-import EServices from "@/types/EServices";
+import { EPractitionerTypes, IAdminPractitionersClient } from "@/modules/practitioners/types";
+import { EServices } from "@/types";
 import { service } from "@/utils/services/ServiceProvider";
 import { Vue, Component, Prop } from "vue-property-decorator";
 

@@ -1,6 +1,7 @@
 <template>
   <div class="profilePhoto" @click="onClick">
-    <v-img :src="src" width="300" height="300" class="image"/>
+    <v-img :src="src" width="300" height="300" class="image" v-if="src"/>
+    <v-icon size="300" v-else>{{ emptyStateIcon }}</v-icon>
     <div class="overlay">
       <v-icon color="white" size="100">camera</v-icon>
       <p>Click to change photo</p>
@@ -18,6 +19,11 @@ export default class ProfilePhoto extends Vue {
     required: true
   })
   src!: string;
+
+  @Prop({
+    type: String
+  })
+  emptyStateIcon!: string;
 
   onClick(event: any) {
     this.$emit("click");
@@ -40,6 +46,7 @@ export default class ProfilePhoto extends Vue {
   top: 0;
   left: 0;
   width: 300px;
+  height: 300px;
   bottom: 0;
   background: rgba(0,0,0,0.5);
   color: white;

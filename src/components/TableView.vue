@@ -49,7 +49,7 @@
           </template>
         </custom-table>
       </v-card-text>
-      <v-card-title class="caption my-0 pt-0" v-if="items.length > 0">
+      <v-card-title class="caption my-0 pt-0">
         <v-spacer/>
         <div class="mx-5">
           <v-select 

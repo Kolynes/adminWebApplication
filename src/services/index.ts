@@ -1,16 +1,13 @@
-import "./store-service/StoreService";
-
-import "./clients/HttpClient";
-import "./clients/AdminAgentsClient";
-import "./clients/AdminCustomersClient";
-import "./clients/AdminOrganizationsClient";
-import "./clients/AdminPractitionersClient";
-import "./clients/AdminRidesClient";
-import "./clients/AdminTripsClient";
-import "./clients/AdminUsersClient";
-import "./clients/AuthClient";
-import "./clients/ProductsClient";
-import "./clients/AdminOrdersClient";
-import "./clients/AdminRidesClient";
-
-import "./maps/MapsService";
+import "@/services/StoreService";
+import "@/services/HttpClient";
+import "@/modules/admins/services/AdminUsersClient";
+import "@/modules/agents/services/AdminAgentsClient";
+import "@/modules/auth/services/AuthClient";
+import "@/modules/customers/services/AdminCustomersClient";
+import "@/modules/maps/services/MapsService";
+import "@/modules/orders/services/AdminOrdersClient";
+import "@/modules/organizations/services/AdminOrganizationsClient";
+import "@/modules/practitioners/services/AdminPractitionersClient";
+import "@/modules/products/services/ProductsClient";
+import "@/modules/rides/services/AdminRidesClient";
+import "@/modules/trips/services/AdminTripsClient";

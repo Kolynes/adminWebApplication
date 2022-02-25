@@ -5,8 +5,8 @@ import vuetify from './plugins/vuetify';
 import "./assets/css/material.scss"
 import "@/services";
 import ServiceProvider from './utils/services/ServiceProvider';
-import { IStoreService } from './services/services';
-import EServices from './types/EServices';
+import { IStoreService } from './services/types';
+import { EServices } from './types';
 
 Vue.config.productionTip = false;
 

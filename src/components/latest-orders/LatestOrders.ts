@@ -1,4 +1,4 @@
-import IOrder from "@/types/IOrder";
+import { IOrder } from "@/modules/orders/types";
 import {Vue, Component} from "vue-property-decorator";
 
 @Component

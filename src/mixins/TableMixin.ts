@@ -61,6 +61,11 @@ export default class TableMixin<T> extends Vue implements ITableView<T> {
     this.numberOfPages = response.numberOfPages;
   }
 
+  reset() {
+    this.page = 1;
+    this.search();
+  }
+
   @Watch("searchString")
   onSearchStringChange() {
     if(this.searchTimeout != null)

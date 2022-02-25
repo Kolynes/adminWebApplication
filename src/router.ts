@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import EOrganizationTypes from './types/EOrganizationTypes'
-import EPractitionerTypes from './types/EPractitionerTypes'
-import EProductTypes from './types/EProductTypes'
+import { EOrganizationTypes } from './modules/organizations/types';
+import { EPractitionerTypes } from './modules/practitioners/types';
+import { EProductTypes } from './modules/products/types';
 
 Vue.use(Router)
 
@@ -19,44 +19,44 @@ export default new Router({
     {
       path: "/login",
       component: () =>
-        import("@/views/login/Login.vue"),
+        import("@/modules/auth/views/login/Login.vue"),
       props: route => route.query
     },
     {
       path: "/dashboard",
       component: () =>
-        import("@/views/dashboard/Dashboard.vue"),
+        import("@/modules/dashboard/views/dashboard/Dashboard.vue"),
       props: route => route.query,
       redirect: "/dashboard/home",
       children: [
         {
           path: "/dashboard/home",
           component: () =>
-            import("@/views/dashboard/home/Home.vue"),
+            import("@/modules/dashboard/views/home/Home.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/account",
           component: () =>
-            import("@/views/dashboard/account/Account.vue"),
+            import("@/modules/dashboard/views/account/Account.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/orders",
           component: () =>
-            import("@/views/dashboard/orders/Orders.vue"),
+            import("@/modules/orders/views/orders/Orders.vue"),
           props: route => route.query,
         },
         {
           path: "/dashboard/orders/details",
           component: () =>
-            import("@/views/dashboard/orders/order-details/OrderDetails.vue"),
+            import("@/modules/orders/views/order-details/OrderDetails.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/drugs",
           component: () =>
-            import("@/views/dashboard/products/Products.vue"),
+            import("@/modules/products/views/products/Products.vue"),
           props: route => {
             route.query.type = EProductTypes.drug;
             return route.query;
@@ -65,7 +65,7 @@ export default new Router({
         {
           path: "/dashboard/drugs/details",
           component: () =>
-            import("@/views/dashboard/products/product-details/ProductDetails.vue"),
+            import("@/modules/products/views/product-details/ProductDetails.vue"),
           props: route => {
             route.query.type = EProductTypes.drug;
             return route.query;
@@ -74,7 +74,7 @@ export default new Router({
         {
           path: "/dashboard/equipment",
           component: () =>
-            import("@/views/dashboard/products/Products.vue"),
+            import("@/modules/products/views/products/Products.vue"),
           props: route => {
             route.query.type = EProductTypes.equipment;
             return route.query;
@@ -83,7 +83,7 @@ export default new Router({
         {
           path: "/dashboard/equipment/details",
           component: () =>
-            import("@/views/dashboard/products/product-details/ProductDetails.vue"),
+            import("@/modules/products/views/product-details/ProductDetails.vue"),
           props: route => {
             route.query.type = EProductTypes.equipment;
             return route.query;
@@ -92,55 +92,55 @@ export default new Router({
         {
           path: "/dashboard/admins",
           component: () =>
-            import("@/views/dashboard/admins/Admins.vue"),
+            import("@/modules/admins/views/admins/Admins.vue"),
           props: route => route.query,
         },
         {
           path: "/dashboard/admins/details",
           component: () =>
-            import("@/views/dashboard/admins/admin-details/AdminDetails.vue"),
+            import("@/modules/admins/views/admin-details/AdminDetails.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/customers",
           component: () =>
-            import("@/views/dashboard/customers/Customers.vue"),
+            import("@/modules/customers/views/customers/Customers.vue"),
           props: route => route.query,
         },
         {
           path: "/dashboard/customers/details",
           component: () =>
-            import("@/views/dashboard/customers/customer-details/CustomerDetails.vue"),
+            import("@/modules/customers/views/customer-details/CustomerDetails.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/agents",
           component: () =>
-            import("@/views/dashboard/agents/Agents.vue"),
+            import("@/modules/agents/views/agents/Agents.vue"),
           props: route => route.query,
         },
         {
           path: "/dashboard/agents/details",
           component: () =>
-            import("@/views/dashboard/agents/agent-details/AgentDetails.vue"),
+            import("@/modules/agents/views/agent-details/AgentDetails.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/rides",
           component: () =>
-            import("@/views/dashboard/rides/Rides.vue"),
+            import("@/modules/rides/views/rides/Rides.vue"),
           props: route => route.query,
         },
         {
           path: "/dashboard/rides/details",
           component: () =>
-            import("@/views/dashboard/rides/ride-details/RideDetails.vue"),
+            import("@/modules/rides/views/ride-details/RideDetails.vue"),
           props: route => route.query
         },
         {
           path: "/dashboard/pharmacies",
           component: () =>
-            import("@/views/dashboard/organizations/Organizations.vue"),
+            import("@/modules/organizations/views/organizations/Organizations.vue"),
           props: route => {
             route.query.type = EOrganizationTypes.pharmacy
             return route.query
@@ -149,7 +149,7 @@ export default new Router({
         {
           path: "/dashboard/pharmacies/details",
           component: () =>
-            import("@/views/dashboard/organizations/organization-details/OrganizationDetails.vue"),
+            import("@/modules/organizations/views/organization-details/OrganizationDetails.vue"),
           props: route => {
             route.query.type = EOrganizationTypes.pharmacy
             return route.query
@@ -158,7 +158,7 @@ export default new Router({
         {
           path: "/dashboard/pharmacies/products",
           component: () =>
-            import("@/views/dashboard/organizations/organization-products/OrganizationProducts.vue"),
+            import("@/modules/organizations/views/organization-products/OrganizationProducts.vue"),
           props: route => {
             route.query.type = EProductTypes.drug
             return route.query
@@ -167,7 +167,7 @@ export default new Router({
         {
           path: "/dashboard/oems",
           component: () =>
-            import("@/views/dashboard/organizations/Organizations.vue"),
+            import("@/modules/organizations/views/organizations/Organizations.vue"),
           props: route => {
             route.query.type = EOrganizationTypes.OEM
             return route.query
@@ -176,7 +176,7 @@ export default new Router({
         {
           path: "/dashboard/oems/details",
           component: () =>
-            import("@/views/dashboard/organizations/organization-details/OrganizationDetails.vue"),
+            import("@/modules/organizations/views/organization-details/OrganizationDetails.vue"),
           props: route => {
             route.query.type = EOrganizationTypes.OEM
             return route.query
@@ -185,7 +185,7 @@ export default new Router({
         {
           path: "/dashboard/oems/products",
           component: () =>
-            import("@/views/dashboard/organizations/organization-products/OrganizationProducts.vue"),
+            import("@/modules/organizations/views/organization-products/OrganizationProducts.vue"),
           props: route => {
             route.query.type = EProductTypes.equipment
             return route.query
@@ -194,7 +194,7 @@ export default new Router({
         {
           path: "/dashboard/doctors",
           component: () =>
-            import("@/views/dashboard/practitioners/Practitioners.vue"),
+            import("@/modules/practitioners/views/practitioners/Practitioners.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.doctor
             return route.query
@@ -203,7 +203,7 @@ export default new Router({
         {
           path: "/dashboard/doctors/details",
           component: () =>
-            import("@/views/dashboard/practitioners/practitioner-details/PractitionerDetails.vue"),
+            import("@/modules/practitioners/views/practitioner-details/PractitionerDetails.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.doctor
             return route.query
@@ -212,7 +212,7 @@ export default new Router({
         {
           path: "/dashboard/nurses",
           component: () =>
-            import("@/views/dashboard/practitioners/Practitioners.vue"),
+            import("@/modules/practitioners/views/practitioners/Practitioners.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.nurse
             return route.query
@@ -221,7 +221,7 @@ export default new Router({
         {
           path: "/dashboard/nurses/details",
           component: () =>
-            import("@/views/dashboard/practitioners/practitioner-details/PractitionerDetails.vue"),
+            import("@/modules/practitioners/views/practitioner-details/PractitionerDetails.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.nurse
             return route.query
@@ -230,7 +230,7 @@ export default new Router({
         {
           path: "/dashboard/physiotherapists",
           component: () =>
-            import("@/views/dashboard/practitioners/Practitioners.vue"),
+            import("@/modules/practitioners/views/practitioners/Practitioners.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.physiotherapist
             return route.query
@@ -239,7 +239,7 @@ export default new Router({
         {
           path: "/dashboard/physiotherapists/details",
           component: () =>
-            import("@/views/dashboard/practitioners/practitioner-details/PractitionerDetails.vue"),
+            import("@/modules/practitioners/views/practitioner-details/PractitionerDetails.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.physiotherapist
             return route.query
@@ -248,7 +248,7 @@ export default new Router({
         {
           path: "/dashboard/hospitals",
           component: () =>
-            import("@/views/dashboard/practitioners/Practitioners.vue"),
+            import("@/modules/practitioners/views/practitioners/Practitioners.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.hospital
             return route.query
@@ -257,7 +257,7 @@ export default new Router({
         {
           path: "/dashboard/hospitals/details",
           component: () =>
-            import("@/views/dashboard/practitioners/practitioner-details/PractitionerDetails.vue"),
+            import("@/modules/practitioners/views/practitioner-details/PractitionerDetails.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.hospital
             return route.query
@@ -266,7 +266,7 @@ export default new Router({
         {
           path: "/dashboard/laboratories",
           component: () =>
-            import("@/views/dashboard/practitioners/Practitioners.vue"),
+            import("@/modules/practitioners/views/practitioners/Practitioners.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.laboratory
             return route.query
@@ -275,7 +275,7 @@ export default new Router({
         {
           path: "/dashboard/laboratories/details",
           component: () =>
-            import("@/views/dashboard/practitioners/practitioner-details/PractitionerDetails.vue"),
+            import("@/modules/practitioners/views/practitioner-details/PractitionerDetails.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.laboratory
             return route.query
@@ -284,7 +284,7 @@ export default new Router({
         {
           path: "/dashboard/ambulances",
           component: () =>
-            import("@/views/dashboard/practitioners/Practitioners.vue"),
+            import("@/modules/practitioners/views/practitioners/Practitioners.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.ambulance
             return route.query
@@ -293,24 +293,24 @@ export default new Router({
         {
           path: "/dashboard/ambulances/details",
           component: () =>
-            import("@/views/dashboard/practitioners/practitioner-details/PractitionerDetails.vue"),
+            import("@/modules/practitioners/views/practitioner-details/PractitionerDetails.vue"),
           props: route => {
             route.query.type = EPractitionerTypes.ambulance
             return route.query
           }
         },
         {
-          path: "/dashboard/timesheet",
+          path: "/dashboard/trips",
           component: () =>
-            import("@/views/dashboard/timesheet/Timesheet.vue"),
+            import("@/modules/trips/views/trips/Trips.vue"),
           props: route => route.query
         },
         {
-          path: "/dashboard/reports",
+          path: "/dashboard/trips/details",
           component: () =>
-            import("@/views/dashboard/reports/Reports.vue"),
+            import("@/modules/trips/views/trip-details/TripDetails.vue"),
           props: route => route.query
-        },
+        }
       ]
     }
   ],

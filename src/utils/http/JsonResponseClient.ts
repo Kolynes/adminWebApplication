@@ -6,22 +6,22 @@ import IJsonResponse from "../types/IJsonResponse";
 import IJsonResponseClient, { JsonResponseAdapter } from "../types/IJsonResponseClient";
 
 export default class JsonResponseClient extends Service implements IJsonResponseClient {
-  protected baseUrl: string = ""; 
+  protected baseUrl: string = "";
   protected headers: IIndexableObject = {};
   jsonResponseAdapter!: JsonResponseAdapter;
   protected debug: boolean = false;
   protected facade: IIndexableObject<IJsonResponse> = {};
 
   private async exec(
-    url: string, 
-    method: string, 
-    body?: IIndexableObject, 
+    url: string,
+    method: string,
+    body?: IIndexableObject,
     files?: IIndexableObject<FileList | File[]>,
     contentType?: EContentTypes
   ): Promise<IJsonResponse> {
-    if(this.debug) {
+    if (this.debug) {
       await delay(2000);
-      if(this.facade != {})
+      if (this.facade != {})
         return this.facade[url.split("?")[0]];
     }
     const processedHeaders = <IIndexableObject>{};
@@ -29,10 +29,10 @@ export default class JsonResponseClient extends Service implements IJsonResponse
       if (this.headers[key] instanceof Function)
         processedHeaders[key] = await this.headers[key]();
       else processedHeaders[key] = this.headers[key];
-      if(!processedHeaders[key])
+      if (!processedHeaders[key])
         delete processedHeaders[key];
     }
-    if(body instanceof Object && files === undefined)
+    if (body instanceof Object && contentType != EContentTypes.multipart && files === undefined)
       processedHeaders["content-type"] = EContentTypes.json;
     const response = await fetch(this.buildUrl(url), {
       method,
@@ -43,8 +43,8 @@ export default class JsonResponseClient extends Service implements IJsonResponse
   }
 
   private buildBody(
-    method: string, 
-    body?: IIndexableObject, 
+    method: string,
+    body?: IIndexableObject,
     files?: IIndexableObject<FileList | File[]>,
     contentType?: EContentTypes
   ): BodyInit | null | undefined {
@@ -81,8 +81,8 @@ export default class JsonResponseClient extends Service implements IJsonResponse
   }
 
   public post(
-    url: string, 
-    data?: IIndexableObject, 
+    url: string,
+    data?: IIndexableObject,
     files?: IIndexableObject<FileList | File[]>,
     contentType?: EContentTypes
   ): Promise<IJsonResponse> {
@@ -90,11 +90,11 @@ export default class JsonResponseClient extends Service implements IJsonResponse
   }
 
   public patch(
-    url: string, 
-    data?: IIndexableObject, 
+    url: string,
+    data?: IIndexableObject,
     files?: IIndexableObject<FileList | File[]>,
     contentType?: EContentTypes
-    ): Promise<IJsonResponse> {
+  ): Promise<IJsonResponse> {
     return this.exec(url, "PATCH", data, files, contentType);
   }
 

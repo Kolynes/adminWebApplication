@@ -1,5 +1,6 @@
-import { IStoreService } from "@/services/services";
-import EServices from "@/types/EServices";
+
+import { IStoreService } from "@/services/types";
+import { EServices } from "@/types";
 import ServiceProvider from "@/utils/services/ServiceProvider";
 import { Vue, Component } from "vue-property-decorator";
 
