@@ -72,7 +72,8 @@ export default class OrganizationProducts extends Mixins(TableMixin) implements 
   }
 
   async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IProduct>> {
-    const response = await this.productsClient.getProducts(
+    const response = await this.productsClient.getProductsByOrganization(
+      this.organizationId,
       this.type,
       searchString, 
       page, 

@@ -143,9 +143,7 @@ class ProductsClient extends Service implements IProductsClient {
         dosage,
         drugType,
         productType
-      },
-      undefined,
-      EContentTypes.multipart
+      }
     );
   }
 

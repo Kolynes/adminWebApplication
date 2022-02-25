@@ -33,7 +33,7 @@
                   prepend-inner-icon="mdi-note-text"
                   v-model="description"
                   type="phone"
-                  :rules="[requiredLengthRule(20, 150)]"
+                  :rules="[requiredLengthRule(0, 500)]"
                 />
                 <v-layout>
                   <v-flex xs6>
@@ -101,7 +101,7 @@
                   outlined
                   prepend-inner-icon="mdi-note-text"
                   v-model="dosage"
-                  :rules="[requiredLengthRule(20, 150)]"
+                  :rules="[requiredLengthRule(0, 500)]"
                   v-if="type == 'DRUG'"
                 />
               </v-flex>
