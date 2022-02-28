@@ -36,6 +36,12 @@ export interface IUser {
   isDeleted: boolean;
 }
 
+export interface IAccount {
+  userType: EUserType;
+  id: number;
+  email: string;
+}
+
 export interface IPermission {
   id: number;
   name: string;

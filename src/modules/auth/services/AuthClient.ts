@@ -21,7 +21,7 @@ class AuthClient extends Service implements IAuthClient {
   @throws("Failed to login")
   async login(email: string, password: string): Promise<IJsonResponse> {
     const response = await this.http.post(
-      "/admin/auth/login",
+      "/users/login",
       { email, password }
     );
     if (response.status == 200)

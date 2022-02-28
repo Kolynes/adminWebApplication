@@ -2,7 +2,6 @@ import IVForm from "@/utils/types/IVForm";
 import { emailRule, requiredLengthRule, requiredRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
 import { Component, Ref, Prop, Mixins } from "vue-property-decorator";
-import { delay } from "@/utils/time";
 import { EOrganizationTypes, IAdminOrganizationsClient, IOrganization, IOrganizationEditor } from "@/modules/organizations/types";
 import { EServices } from "@/types";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";

@@ -35,6 +35,16 @@
             </v-btn>
             <v-btn
               block
+              color="primary"
+              to="/signup"
+              class="font-weight-bold text-capitalize mt-3"
+              elevation="0"
+              outlined
+            >
+              Sign up as a Practitioner
+            </v-btn>
+            <v-btn
+              block
               text
               color="primary"
               class="font-weight-bold text-capitalize mt-3"

@@ -9,6 +9,7 @@ import "@/modules/maps/services/MapsService";
 import "@/modules/orders/services/AdminOrdersClient";
 import "@/modules/organizations/services/AdminOrganizationsClient";
 import "@/modules/practitioners/services/AdminPractitionersClient";
+import "@/modules/practitioners/services/PractitionersClient";
 import "@/modules/products/services/ProductsClient";
 import "@/modules/rides/services/AdminRidesClient";
 import "@/modules/trips/services/AdminTripsClient";

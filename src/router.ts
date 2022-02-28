@@ -23,6 +23,12 @@ export default new Router({
       props: route => route.query
     },
     {
+      path: "/signup",
+      component: () =>
+        import("@/modules/auth/views/practitioner-sign-up/PractitionerSignUp"),
+      props: route => route.query
+    },
+    {
       path: "/dashboard",
       component: () =>
         import("@/modules/dashboard/views/dashboard/Dashboard.vue"),
