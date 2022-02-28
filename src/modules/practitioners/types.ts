@@ -151,7 +151,7 @@ export interface IPractitonersClient extends Service {
     address: string,
     city: string,
     latitude: number,
-    longitiude: number,
+    longitude: number,
     practitionerType: EPractitionerTypes,
     identificationType: EIdentificationTypes,
     verificationType: EVerificationTypes,
