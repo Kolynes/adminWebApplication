@@ -1,10 +1,12 @@
-import PractitionersEditorMixin from "@/mixins/PractitionersEditorMixin";
-import { Component, Mixins, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import FileGetter from "@/components/file-getter/FileGetter.vue";
 import ProfilePhoto from "@/components/ProfilePhoto.vue";
 import VEmptyState from "@/vuetify-extensions/VEmptyState.vue";
-import { IPractitioner } from "../../types";
+import { EPractitionerTypes, IAdminPractitionersClient, IPractitioner } from "../../types";
 import { datetime } from "@/utils/time";
+import { EServices } from "@/types";
+import { service } from "@/utils/services/ServiceProvider";
+import { typeTextPlurals, typeTexts } from "../../constants";
 
 @Component({
   components: {
@@ -13,12 +15,29 @@ import { datetime } from "@/utils/time";
     VEmptyState
   }
 })
-export default class PractitionerDetails extends Mixins(PractitionersEditorMixin) {
+export default class PractitionerDetails extends Vue {
   @Prop({
     type: Number,
     required: true
   })
   id!: number;
+
+  @Prop({
+    type: String,
+    default: EPractitionerTypes.doctor
+  })
+  type!: EPractitionerTypes;
+
+  @service(EServices.adminPractitioners)
+  practitionersClient!: IAdminPractitionersClient;
+
+  get typeText(): string {
+    return typeTexts[this.type];
+  }
+
+  get typeTextPlural(): string {
+    return typeTextPlurals[this.type];
+  }
 
   loading = true;
   practitioner: IPractitioner | null = null;
@@ -32,6 +51,26 @@ export default class PractitionerDetails extends Mixins(PractitionersEditorMixin
       this.practitioner = response.data;
     }
     else toast({ message: `${this.typeText} not found` });
+  }
+
+  async verifyPractitioner() {
+    const result = await confirm({ icon: "mdi-check-all", title: `Verify ${this.typeText.toLowerCase()}`});
+    if(!result) return;
+    toast({ loading: true, message: `Verifying ${this.typeText.toLowerCase()}...` });
+    const response = await this.practitionersClient.verifyPractitioner(this.id);
+    toast(false);
+    if(response.status == 200) toast({ message: `${this.typeText} verified`});
+    else toast({ message: response.errors!.summary });
+  }
+
+  async completeIdentification() {
+    const result = await confirm({ icon: "mdi-check", title: `Complete ${this.typeText.toLowerCase()} identification`});
+    if(!result) return;
+    toast({ loading: true, message: `Completing ${this.typeText.toLowerCase()} identification...` });
+    const response = await this.practitionersClient.completeIdentifcation(this.id);
+    toast(false);
+    if(response.status == 200) toast({ message: `${this.typeText} identification completed`});
+    else toast({ message: response.errors!.summary });
   }
 
   deletePractitioner(practitioner: IPractitioner) {

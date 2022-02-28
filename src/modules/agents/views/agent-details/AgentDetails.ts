@@ -1,16 +1,18 @@
 import { Component, Vue, Prop, Ref } from "vue-property-decorator";
 import ProfilePhoto from "@/components/ProfilePhoto.vue";
-import { IAdminAgentsClient, IAgent, IAgentEditor } from "../../types";
+import { IAdminAgentsClient, IAgent, IAgentCredentialsEditor, IAgentEditor } from "../../types";
 import { EServices } from "@/types";
 import { service } from "@/utils/services/ServiceProvider";
 import FileGetter, { IFileGetter } from "@/components/file-getter/FileGetter";
 import AgentEditor from "../../components/agent-editor/AgentEditor";
+import AgentCredentialsEditor from "../../components/agent-credentials-editor/AgentCredentialsEditor";
 
 @Component({
   components: {
     ProfilePhoto,
     FileGetter,
-    AgentEditor
+    AgentEditor,
+    AgentCredentialsEditor
   }
 })
 export default class AgentDetails extends Vue {
@@ -25,6 +27,9 @@ export default class AgentDetails extends Vue {
 
   @Ref()
   agentEditor!: IAgentEditor;
+
+  @Ref()
+  agentCredentialsEditor!: IAgentCredentialsEditor;
 
   @service(EServices.adminAgent)
   agentsClient!: IAdminAgentsClient;
@@ -45,8 +50,10 @@ export default class AgentDetails extends Vue {
     if (file !== null) {
       toast({ loading: true, message: "Changing profile picture..." })
       const response = await this.agentsClient.changeProfilePhoto(id, file);
-      if (response.status == 200)
+      if (response.status == 200) {
         toast({ message: "Profile picture changed" });
+        this.getAgent();
+      }
       else toast({ message: "Failed to change profile picture" });
     }
   }

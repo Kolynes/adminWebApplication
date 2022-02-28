@@ -41,6 +41,10 @@ export interface IAdminUsersClient extends Service {
 
 }
 
+export interface IAdminSettingsClient extends Service {
+  getCities(): Promise<IJsonResponse>;
+}
+
 export interface IAdminEditor {
   beginEditAdmin(admin: IUser): void;
   toggleCreateAdminDialog(): void;

@@ -1,8 +1,7 @@
 <template>
-    <v-dialog v-model="show" width="300" persistent>
+    <v-dialog v-model="show" min-width="300" max-width="600" persistent>
         <v-dialog-content>
             <v-card :dark="dark" :light="light">
-
                 <v-card-title>
                     <v-icon class="mr-2">{{icon}}</v-icon> <span>{{title}}</span>
                     <v-spacer/>

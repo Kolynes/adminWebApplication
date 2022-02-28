@@ -69,6 +69,44 @@
             <v-btn
               rounded
               text
+              color="blue white--text"
+              elevation="0"
+              class="font-weight-bold text-capitalize"
+              @click="deletePractitioner(practitioner)"
+            >
+              <v-icon class="mr-2">mdi-lead-pencil</v-icon>
+              Edit {{ typeText }}
+            </v-btn>
+            <br>
+            <v-btn
+              rounded
+              text
+              color="orange white--text"
+              elevation="0"
+              class="font-weight-bold text-capitalize"
+              @click="completeIdentification"
+              v-if="!practitioner.identified"
+            >
+              <v-icon class="mr-2">mdi-check</v-icon>
+              Complete {{ typeText }} Identification
+            </v-btn>
+            <br>
+            <v-btn
+              rounded
+              text
+              color="green white--text"
+              elevation="0"
+              class="font-weight-bold text-capitalize"
+              @click="verifyPractitioner"
+              v-if="!practitioner.verified"
+            >
+              <v-icon class="mr-2">mdi-check-all</v-icon>
+              Verify {{ typeText }}
+            </v-btn>
+            <br>
+            <v-btn
+              rounded
+              text
               color="red white--text"
               elevation="0"
               class="font-weight-bold text-capitalize"

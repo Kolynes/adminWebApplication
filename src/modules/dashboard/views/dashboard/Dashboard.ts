@@ -1,5 +1,5 @@
 import { Vue, Component, Watch, Ref } from "vue-property-decorator";
-import ServiceProvider from "@/utils/services/ServiceProvider";
+import ServiceProvider, { service } from "@/utils/services/ServiceProvider";
 import { namespace } from "vuex-class";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue"
 import IVForm from "@/utils/types/IVForm";
@@ -7,6 +7,7 @@ import { requiredLengthRule, requiredRule } from "@/utils/rules";
 import { IStoreService } from "@/services/types";
 import { EServices } from "@/types";
 import { IAuthClient, IUser } from "@/modules/auth/types";
+import { IAdminDashboardClient } from "../../types";
 
 const AdminModule = namespace("AdminModule");
 
@@ -22,7 +23,6 @@ const AdminModule = namespace("AdminModule");
   }
 })
 export default class Dashboard extends Vue {
-  authClient = ServiceProvider.getInstance().getService<IAuthClient>(EServices.auth);
   changePasswordDialogVisible = false
   changingPassword = false;
   oldPassword = "";
@@ -124,6 +124,9 @@ export default class Dashboard extends Vue {
 
   @AdminModule.State
   admin!: IUser;
+
+  @service(EServices.auth)
+  authClient!: IAuthClient;
 
   requiredRule = requiredRule;
   requiredLengthRule = requiredLengthRule;

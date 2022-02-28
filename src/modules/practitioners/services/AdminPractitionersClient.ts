@@ -43,8 +43,8 @@ class AdminPractitionersClient extends Service implements IAdminPractitionersCli
     companyName: string,
     address: string,
     city: string,
-    latitude: string,
-    longitiude: string,
+    latitude: number,
+    longitude: number,
     practitionerType: EPractitionerTypes,
     identificationType: EIdentificationTypes,
     verificationType: EVerificationTypes,
@@ -66,7 +66,7 @@ class AdminPractitionersClient extends Service implements IAdminPractitionersCli
         address,
         city,
         latitude,
-        longitiude,
+        longitude,
         practitionerType,
         identificationType,
         verificationType,
@@ -92,15 +92,8 @@ class AdminPractitionersClient extends Service implements IAdminPractitionersCli
     companyName: string,
     address: string,
     city: string,
-    latitude: string,
-    longitiude: string,
-    practitionerType: EPractitionerTypes,
-    identificationType: EIdentificationTypes,
-    verificationType: EVerificationTypes,
-    identificationPhoto: File,
-    verificationPhoto: File,
-    profilePhoto: File,
-    password: string
+    latitude: number,
+    longitude: number
   ): Promise<IJsonResponse> {
     return await this.http.patch(
       `/admin/users/practitioners/${id}`,
@@ -115,16 +108,7 @@ class AdminPractitionersClient extends Service implements IAdminPractitionersCli
         address,
         city,
         latitude,
-        longitiude,
-        practitionerType,
-        identificationType,
-        verificationType,
-        password
-      },
-      {
-        identificationPhoto: [identificationPhoto],
-        verificationPhoto: [verificationPhoto],
-        profilePhoto: [profilePhoto]
+        longitude
       }
     );
   }

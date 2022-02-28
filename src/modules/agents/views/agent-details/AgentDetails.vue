@@ -53,6 +53,18 @@
             <v-btn
               rounded
               text
+              color="primary"
+              elevation="0"
+              class="font-weight-bold text-capitalize mb-2"
+              @click="agentCredentialsEditor.beginEditAgent(agent)"
+            >
+              <v-icon class="mr-2">mdi-lock</v-icon>
+              Edit Agent Credentials
+            </v-btn>
+            <br>
+            <v-btn
+              rounded
+              text
               color="red white--text"
               elevation="0"
               class="font-weight-bold text-capitalize mb-2"
@@ -78,6 +90,7 @@
       </v-flex>
     </v-layout>
     <agent-editor ref="agentEditor" @saved="getAgent"/>
+    <agent-credentials-editor ref="agentCredentialsEditor" @saved="getAgent"/>
     <file-getter ref="fileGetter"/>
   </v-container>
 </template>

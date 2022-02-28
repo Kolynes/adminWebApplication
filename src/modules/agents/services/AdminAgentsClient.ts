@@ -80,9 +80,9 @@ export default class AdminAgentsClient extends Service implements IAdminAgentsCl
 
   @throws("Failed to update agent credentials")
   async updateAgentCredentials(id: number, email: string, password: string): Promise<IJsonResponse> {
-    return await this.http.post(
+    return await this.http.patch(
       `/admin/users/agents/${id}/credentials`,
-      { email, password }
+      { email, password: password || undefined }
     );
   }
 

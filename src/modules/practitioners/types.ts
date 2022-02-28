@@ -1,5 +1,6 @@
 import Service from "@/utils/services/Service";
 import IJsonResponse from "@/utils/types/IJsonResponse";
+import { ILocation } from "../agents/types";
 import { EUserType, IRole } from "../auth/types";
 
 export enum EPractitionerTypes {
@@ -36,14 +37,15 @@ export enum ESubscriptionTypes {
 export interface IPractitioner {
   id: number;
   name: string;
-  address: string;
   email: string;
   profilePhoto: string;
   specialties: string;
   companyName: string;
+  yearsOfExperience: number;
   type: string;
   active: boolean;
   city: string;
+  location: ILocation;
   createdOnDate: string;
   description: string;
   identification: IIdentification;
@@ -101,8 +103,8 @@ export interface IAdminPractitionersClient extends Service {
     companyName: string,
     address: string,
     city: string,
-    latitude: string,
-    longitiude: string,
+    latitude: number,
+    longitude: number,
     practitionerType: EPractitionerTypes,
     identificationType: EIdentificationTypes,
     verificationType: EVerificationTypes,
@@ -123,15 +125,8 @@ export interface IAdminPractitionersClient extends Service {
     companyName: string,
     address: string,
     city: string,
-    latitude: string,
-    longitiude: string,
-    practitionerType: EPractitionerTypes,
-    identificationType: EIdentificationTypes,
-    verificationType: EVerificationTypes,
-    identificationPhoto: File,
-    verificationPhoto: File,
-    profilePhoto: File,
-    password: string
+    latitude: number,
+    longitude: number,
   ): Promise<IJsonResponse>;
 
   completeIdentifcation(
@@ -173,4 +168,9 @@ export interface IPractitonersClient extends Service {
   unsubscribe(id: number): Promise<IJsonResponse>;
 
   deleteAccount(id: number): Promise<IJsonResponse>;
+}
+
+export interface IPractitionerEditor {
+  toggleCreatePractitionerDialog(): void;
+  beginEditPractitioner(practitioner: IPractitioner): void; 
 }

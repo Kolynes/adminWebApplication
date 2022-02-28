@@ -1,15 +1,39 @@
-import { Component, Mixins, Watch } from "vue-property-decorator";
+import { Component, Mixins, Prop, Ref, Watch } from "vue-property-decorator";
 import TableView from "@/components/TableView.vue";
 import TableMixin, { ISearchResults, ITableView } from "@/mixins/TableMixin";
-import PractitionersEditorMixin from "@/mixins/PractitionersEditorMixin";
-import { IPractitioner } from "../../types";
+import { EPractitionerTypes, IAdminPractitionersClient, IPractitioner, IPractitionerEditor } from "../../types";
+import { EServices } from "@/types";
+import { service } from "@/utils/services/ServiceProvider";
+import { typeTextPlurals, typeTexts } from "../../constants";
+import PractitionerEditor from "../../components/practitioner-editor/PractitionerEditor";
 
 @Component({
   components: {
-    TableView
+    TableView,
+    PractitionerEditor
   }
 })
-export default class Practitioners extends Mixins(TableMixin, PractitionersEditorMixin) implements ITableView<IPractitioner> {
+export default class Practitioners extends Mixins(TableMixin) implements ITableView<IPractitioner> {
+  @Prop({
+    type: String,
+    default: EPractitionerTypes.doctor
+  })
+  type!: EPractitionerTypes;
+
+  @service(EServices.adminPractitioners)
+  practitionersClient!: IAdminPractitionersClient;
+
+  @Ref()
+  practitionerEditor!: IPractitionerEditor;
+
+  get typeText(): string {
+    return typeTexts[this.type];
+  }
+
+  get typeTextPlural(): string {
+    return typeTextPlurals[this.type];
+  }
+  
   headers = [
     {
       text: "ID",

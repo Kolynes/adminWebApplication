@@ -1,4 +1,3 @@
-
 import { Loader } from "google-maps";
 import Service, { serviceClass } from "@/utils/services/Service";
 import { IMapsService } from "../types";

@@ -1,6 +1,7 @@
 import "@/services/StoreService";
 import "@/services/HttpClient";
 import "@/modules/admins/services/AdminUsersClient";
+import "@/modules/admins/services/AdminSettingsClient";
 import "@/modules/agents/services/AdminAgentsClient";
 import "@/modules/auth/services/AuthClient";
 import "@/modules/customers/services/AdminCustomersClient";
@@ -11,3 +12,4 @@ import "@/modules/practitioners/services/AdminPractitionersClient";
 import "@/modules/products/services/ProductsClient";
 import "@/modules/rides/services/AdminRidesClient";
 import "@/modules/trips/services/AdminTripsClient";
+import "@/modules/dashboard/services/AdminDashboardClient";

@@ -77,3 +77,7 @@ export interface IAgentEditor {
 export interface ISelectAgent {
   getAgent(): Promise<IAgent>;
 }
+
+export interface IAgentCredentialsEditor {
+  beginEditAgent(agent: IAgent): null;
+}
