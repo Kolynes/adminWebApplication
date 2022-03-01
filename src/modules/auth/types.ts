@@ -4,7 +4,8 @@ import IJsonResponse from "@/utils/types/IJsonResponse";
 export enum EUserType {
   admin = "ADMIN",
   customer = "CUSTOMER",
-  practitioner = "PRACTITIONER"
+  practitioner = "PRACTITIONER",
+  organization = "ORGANIZATION"
 }
 
 export enum ERoleTypes {
@@ -40,6 +41,7 @@ export interface IAccount {
   userType: EUserType;
   id: number;
   email: string;
+  token: string;
 }
 
 export interface IPermission {

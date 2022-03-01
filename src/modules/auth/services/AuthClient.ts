@@ -6,7 +6,7 @@ import Service, { serviceClass } from "@/utils/services/Service";
 import { service } from "@/utils/services/ServiceProvider";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
-import { IAuthClient } from "../types";
+import { EUserType, IAccount, IAuthClient } from "../types";
 
 const throws = throwsFactory(JsonResponse.createJsonResponse);
 
@@ -25,7 +25,13 @@ class AuthClient extends Service implements IAuthClient {
       { email, password }
     );
     if (response.status == 200)
-      this.store.instance.commit("AdminModule/setAdmin", response.data);
+      this.store.instance.commit(
+        "AccountModule/setAccount", 
+        {
+          ...response.data, 
+          token: response.baseResponse!.headers.get("authorization")
+        }
+      );
     return response;
   }
 

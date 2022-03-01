@@ -22,9 +22,8 @@ class HttpClient extends JsonResponseClient implements IJsonResponseClient {
   }
 
   async getToken(): Promise<string> {
-    console.log(this)
-    return this.store.adminModule.admin !== null && this.store.adminModule.admin !== undefined
-      ? `Bearer ${this.store.adminModule.admin.token}`
+    return this.store.accountModule.account !== null && this.store.accountModule.account !== undefined
+      ? this.store.accountModule.account.token
       : "";
   }
 }

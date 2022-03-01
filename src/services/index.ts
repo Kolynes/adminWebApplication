@@ -8,6 +8,7 @@ import "@/modules/customers/services/AdminCustomersClient";
 import "@/modules/maps/services/MapsService";
 import "@/modules/orders/services/AdminOrdersClient";
 import "@/modules/organizations/services/AdminOrganizationsClient";
+import "@/modules/organizations/services/OrganizationsClient";
 import "@/modules/practitioners/services/AdminPractitionersClient";
 import "@/modules/practitioners/services/PractitionersClient";
 import "@/modules/products/services/ProductsClient";

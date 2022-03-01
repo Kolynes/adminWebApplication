@@ -69,6 +69,7 @@ class PractitionersClient extends Service implements IPractitonersClient {
     return response;
   }
 
+  @throws("Failed to login")
   async login(email: string, password: string): Promise<IJsonResponse> {
     const response = await this.http.post(
       "/practitioners/login",
@@ -79,6 +80,7 @@ class PractitionersClient extends Service implements IPractitonersClient {
     return response;
   }
 
+  @throws("Failed to subscribe")
   async subscribe(id: number, transactionReference: string, subscriptionType: ESubscriptionTypes): Promise<IJsonResponse> {
     const response = await this.http.post(
       `/practitioners/${id}/subscriptions/subscribe`,
@@ -89,6 +91,7 @@ class PractitionersClient extends Service implements IPractitonersClient {
     return response;
   }
 
+  @throws("Failed to unsubscribe")
   async unsubscribe(id: number): Promise<IJsonResponse> {
     const response = await this.http.post(
       `/practitioners/${id}/subscriptions/subscribe`
@@ -98,11 +101,17 @@ class PractitionersClient extends Service implements IPractitonersClient {
     return response;
   }
 
+  @throws("Failed to delete account")
   async deleteAccount(id: number): Promise<IJsonResponse> {
     const response = await this.http.delete(`/practitioners/${id}`);
     if(response.status == 200)
       this.logout();
     return response;
+  }
+
+  @throws("Failed to get current practitioner")
+  async getCurrent(): Promise<IJsonResponse> {
+    return await this.http.get("/practitioners/current");
   }
 
   async logout(): Promise<boolean> {

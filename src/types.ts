@@ -19,5 +19,6 @@ export enum EServices {
   adminRides,
   practitioners,
   adminDashboard,
-  settings
+  settings,
+  organizations
 }

@@ -1,3 +1,4 @@
+import { IStoreService } from "@/services/types";
 import { EServices } from "@/types";
 import { throwsFactory } from "@/utils/error-management";
 import JsonResponse from "@/utils/http/JsonResponse";
@@ -13,6 +14,9 @@ const throws = throwsFactory(JsonResponse.createJsonResponse);
 class AdminUsersClient extends Service implements IAdminUsersClient {
   @service(EServices.http)
   private http!: IJsonResponseClient;
+
+  @service(EServices.store)
+  private store!: IStoreService;
 
   @throws("Failed to get users")
   async getUsers(search: string, page: number = 1, pageSize: number = 100): Promise<IJsonResponse> {
@@ -90,7 +94,10 @@ class AdminUsersClient extends Service implements IAdminUsersClient {
   }
 
   @throws("Failed to get current admin")
-  async getCurrentAdmin(): Promise<IJsonResponse> {
-    return await this.http.post("/admin/users/current");
+  async getCurrent(): Promise<IJsonResponse> {
+    const response = await this.http.get("/admin/users/current");
+    if(response.status == 200)
+      this.store.instance.commit("AdminModule/setAdmin", response.data);
+    return response;
   }
 }

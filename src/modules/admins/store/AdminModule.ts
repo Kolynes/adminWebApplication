@@ -1,5 +1,5 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { ERoleTypes, IUser } from "../types";
+import { ERoleTypes, IUser } from "../../auth/types";
 
 @Module({ namespaced: true })
 export default class AdminModule extends VuexModule {

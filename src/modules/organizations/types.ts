@@ -58,6 +58,16 @@ export interface IAdminOrganizationsClient extends Service {
 
 }
 
+export interface IOrganizationsClient extends Service {
+  getCurrent(): Promise<IJsonResponse>;
+  getOrders(): Promise<IJsonResponse>;
+  getProducts(): Promise<IJsonResponse>;
+  createProduct(): Promise<IJsonResponse>;
+  updateProduct(): Promise<IJsonResponse>;
+  getDashboard(): Promise<IJsonResponse>;
+  updateOrganization(): Promise<IJsonResponse>;
+}
+
 export interface IOrganizationEditor {
   toggleCreateOrganizationDialog(edit?: boolean): void;
   beginEditOrganization(organization: IOrganization): void;

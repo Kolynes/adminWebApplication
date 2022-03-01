@@ -37,7 +37,7 @@ export interface IAdminUsersClient extends Service {
     permissions: number[]
   ): Promise<IJsonResponse>;
 
-  getCurrentAdmin(): Promise<IJsonResponse>;
+  getCurrent(): Promise<IJsonResponse>;
 
 }
 

@@ -168,6 +168,8 @@ export interface IPractitonersClient extends Service {
   unsubscribe(id: number): Promise<IJsonResponse>;
 
   deleteAccount(id: number): Promise<IJsonResponse>;
+
+  getCurrent(): Promise<IJsonResponse>;
 }
 
 export interface IPractitionerEditor {
