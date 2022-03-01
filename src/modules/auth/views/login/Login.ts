@@ -47,7 +47,6 @@ export default class Login extends Vue {
     this.signingIn = false;
     if (response.status == 200) {
       const account = response.data as IAccount;
-      console.log(account)
       switch(account.userType) {
         case EUserType.admin:
           await this.adminsClient.getCurrent();

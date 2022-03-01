@@ -8,6 +8,7 @@ import { IUser } from "@/modules/auth/types";
 import { IAdminAgentsClient, IAgent, ISelectAgent } from "@/modules/agents/types";
 import { IAdminCustomersClient } from "@/modules/customers/types";
 import { typeTextPlurals } from "../../contants";
+import { datetime } from "@/utils/time";
 
 @Component({
   components: {
@@ -63,6 +64,8 @@ export default class OrderDetails extends Vue {
   get agent(): IAgent | null {
     return this.order && this.order.deliveryAgent;
   };
+
+  datetime = datetime;
 
   getSelectedOrderTypeClassName() {
     return this.orderTypes.find(element => element.name == this.order!.status)!.className

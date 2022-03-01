@@ -124,6 +124,19 @@
               </v-layout>
             </v-card-text>
           </v-card>
+          <v-card class="my-5">
+            <v-card-title>
+              <span class="body-1">Transaction</span>
+            </v-card-title>
+            <v-card-text>
+              <p class="title mb-0">{{ order.transaction.description }}</p>
+              <span class="caption mb-4 d-block">{{ datetime(order.transaction.confirmDate) }}</span>
+              <p class="display-1"> ₦{{ (parseInt(order.transaction.charge.amount)/100).toLocaleString() }}</p>
+              <span class="d-block font-weight-bold caption mb-2">
+                Reference: {{ order.transaction.charge.reference }}
+              </span>
+            </v-card-text>
+          </v-card>
           <div v-if="order.prescriptionUrl">
             <p class="title">Prescription:</p>
             <v-img :src="order.prescriptionUrl" />

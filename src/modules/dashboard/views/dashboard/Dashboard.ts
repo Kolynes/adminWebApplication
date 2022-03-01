@@ -36,7 +36,7 @@ export default class Dashboard extends Vue {
       routes: [
         { icon: "mdi-view-dashboard", path: "/dashboard/home", name: "Dashboard" },
         { icon: "mdi-check-all", path: "/dashboard/orders", name: "Orders" },
-        { icon: "mdi-credit-card", path: "/dashboard/subscriptions", name: "Subscriptions" },
+        // { icon: "mdi-credit-card", path: "/dashboard/subscriptions", name: "Subscriptions" },
       ]
     },
     {
