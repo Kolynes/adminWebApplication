@@ -1,9 +1,13 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { ERoleTypes, IAccount, IUser } from "../types";
+import { ERoleTypes, EUserType, IAccount, IUser } from "../types";
 
 @Module({ namespaced: true })
 export default class AccountModule extends VuexModule {
   account?: IAccount = undefined;
+
+  get isLoggedIn(): boolean {
+    return this.account != undefined;
+  }
 
   @Mutation
   setAccount(account: IUser) {
@@ -16,6 +20,12 @@ export default class AccountModule extends VuexModule {
     if(localStorage.getItem("account") != null)
       this.account = JSON.parse(
         localStorage.getItem("account")!
-      );
+      )
+  }
+
+  @Mutation
+  clear() {
+    localStorage.clear();
+    this.account = undefined;
   }
 }

@@ -1,17 +1,9 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-import { ERoleTypes, IUser } from "../../auth/types";
+import { IUser } from "../../auth/types";
 
 @Module({ namespaced: true })
 export default class AdminModule extends VuexModule {
   admin?: IUser = undefined;
-
-  get isLoggedIn(): boolean {
-    return this.admin != undefined;
-  }
-
-  get isSuperAdmin(): boolean {
-    return this.isLoggedIn && this.admin!.role.name == ERoleTypes.superAdmin;
-  }
 
   @Mutation
   setAdmin(admin: IUser) {

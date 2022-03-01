@@ -52,9 +52,9 @@
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>{{item.name}}</v-list-item-title>
-                  <v-list-item-subtitle v-if="item.location.address">
+                  <v-list-item-subtitle v-if="item.location">
                     <v-icon size="15">mdi-map-marker</v-icon>
-                    {{item.location.address}}
+                    {{ item.location.address }}
                   </v-list-item-subtitle>
                   <v-list-item-subtitle>
                     <v-icon size="15">mdi-phone</v-icon>

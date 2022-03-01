@@ -12,7 +12,10 @@ Vue.config.productionTip = false;
 
 const serviceProvider = ServiceProvider.getInstance();
 const store = serviceProvider.getService<IStoreService>(EServices.store).instance;
+store.commit("AccountModule/getAccount");
 store.commit("AdminModule/getAdmin");
+store.commit("OrganizationModule/getOrganization");
+store.commit("PractitionerModule/getPractitioner");
 
 new Vue({
   router,
