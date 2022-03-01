@@ -1,18 +1,20 @@
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Ref } from "vue-property-decorator";
 import FileGetter from "@/components/file-getter/FileGetter.vue";
 import ProfilePhoto from "@/components/ProfilePhoto.vue";
 import VEmptyState from "@/vuetify-extensions/VEmptyState.vue";
-import { EPractitionerTypes, IAdminPractitionersClient, IPractitioner } from "../../types";
+import { EPractitionerTypes, IAdminPractitionersClient, IPractitioner, IPractitionerEditor } from "../../types";
 import { datetime } from "@/utils/time";
 import { EServices } from "@/types";
 import { service } from "@/utils/services/ServiceProvider";
 import { typeTextPlurals, typeTexts } from "../../constants";
+import PractitionerEditor from "../../components/practitioner-editor/PractitionerEditor";
 
 @Component({
   components: {
     FileGetter,
     ProfilePhoto,
-    VEmptyState
+    VEmptyState,
+    PractitionerEditor
   }
 })
 export default class PractitionerDetails extends Vue {
@@ -27,6 +29,9 @@ export default class PractitionerDetails extends Vue {
     default: EPractitionerTypes.doctor
   })
   type!: EPractitionerTypes;
+
+  @Ref()
+  practitionerEditor!: IPractitionerEditor;
 
   @service(EServices.adminPractitioners)
   practitionersClient!: IAdminPractitionersClient;

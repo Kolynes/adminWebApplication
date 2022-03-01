@@ -72,7 +72,7 @@
               color="blue white--text"
               elevation="0"
               class="font-weight-bold text-capitalize"
-              @click="deletePractitioner(practitioner)"
+              @click="practitionerEditor.beginEditPractitioner(practitioner)"
             >
               <v-icon class="mr-2">mdi-lead-pencil</v-icon>
               Edit {{ typeText }}
@@ -155,6 +155,7 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <practitioner-editor ref="practitionerEditor" @saved="getPractitioner" :type="type"/>
   </v-container>
 </template>
 

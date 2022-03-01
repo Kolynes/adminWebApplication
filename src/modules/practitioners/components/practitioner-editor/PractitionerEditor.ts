@@ -97,11 +97,11 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
     this.specialties = practitioner.specialties;
     this.companyName = practitioner.companyName;
     this.city = practitioner.city;
+    this.toggleCreatePractitionerDialog();
     if(practitioner.location) {
       await this.onEnterAddress(practitioner.location.address);
       this.prediction = this.predictions.find(el => el.description.includes(practitioner.location.address)) || null;
     }
-    this.toggleCreatePractitionerDialog();
     setTimeout(
       () => {
         this.setLocation(parseFloat(practitioner.location.latitude), parseFloat(practitioner.location.longitude));
@@ -170,7 +170,7 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
     if(response.status == 200) {
       this.$emit("saved");
       this.toggleCreatePractitionerDialog();
-      toast({ message: "Practitioner created"});
+      toast({ message: "Practitioner updated"});
     } else {
       toast({ message: response.errors!.summary });
       this.errors = response.errors!.fields;
