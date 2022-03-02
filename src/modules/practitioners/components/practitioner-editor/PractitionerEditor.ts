@@ -164,7 +164,7 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
       this.address,
       this.city,
       this.latitude!,
-      this.longitude!
+      this.longitude!,
     );
     this.creatingPractitioner = false;
     if(response.status == 200) {
