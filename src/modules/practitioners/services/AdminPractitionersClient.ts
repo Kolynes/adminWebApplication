@@ -3,6 +3,7 @@ import { throwsFactory } from "@/utils/error-management";
 import JsonResponse from "@/utils/http/JsonResponse";
 import Service, { serviceClass } from "@/utils/services/Service";
 import { service } from "@/utils/services/ServiceProvider";
+import EContentTypes from "@/utils/types/EContentTypes";
 import IJsonResponse from "@/utils/types/IJsonResponse";
 import IJsonResponseClient from "@/utils/types/IJsonResponseClient";
 import { EIdentificationTypes, EPractitionerTypes, EVerificationTypes, IAdminPractitionersClient } from "../types";
@@ -109,6 +110,19 @@ class AdminPractitionersClient extends Service implements IAdminPractitionersCli
         city,
         latitude,
         longitude
+      },
+      undefined,
+      EContentTypes.multipart
+    );
+  }
+
+  @throws("Failed to change profile picture")
+  async changeProfilePhoto(id: number, profilePhoto: File): Promise<IJsonResponse> {
+    return await this.http.patch(
+      `/admin/users/practitioners/${id}`,
+      undefined,
+      {
+        profilePhoto: [profilePhoto]
       }
     );
   }

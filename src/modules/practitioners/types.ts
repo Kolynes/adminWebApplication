@@ -137,6 +137,8 @@ export interface IAdminPractitionersClient extends Service {
     id: number,
   ): Promise<IJsonResponse>;
 
+  changeProfilePhoto(id: number, profilePhoto: File): Promise<IJsonResponse>;
+
 }
 
 export interface IPractitonersClient extends Service {

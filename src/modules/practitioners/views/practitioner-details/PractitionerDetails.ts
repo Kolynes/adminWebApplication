@@ -8,6 +8,7 @@ import { EServices } from "@/types";
 import { service } from "@/utils/services/ServiceProvider";
 import { typeTextPlurals, typeTexts } from "../../constants";
 import PractitionerEditor from "../../components/practitioner-editor/PractitionerEditor";
+import { IFileGetter } from "@/components/file-getter/FileGetter";
 
 @Component({
   components: {
@@ -32,6 +33,9 @@ export default class PractitionerDetails extends Vue {
 
   @Ref()
   practitionerEditor!: IPractitionerEditor;
+
+  @Ref()
+  fileGetter!: IFileGetter;
 
   @service(EServices.adminPractitioners)
   practitionersClient!: IAdminPractitionersClient;
@@ -76,6 +80,19 @@ export default class PractitionerDetails extends Vue {
     toast(false);
     if(response.status == 200) toast({ message: `${this.typeText} identification completed`});
     else toast({ message: response.errors!.summary });
+  }
+
+  async changeProfilePhoto(id: number) {
+    const file = await this.fileGetter.getFile("image/*", 1 * 1024 * 1024);
+    if(file !== null) {
+      toast({ loading: true, message: "Changing profile picture..."})
+      const response = await this.practitionersClient.changeProfilePhoto(id, file);
+      if(response.status == 200) {
+        toast({ message: "Profile picture changed" });
+        this.getPractitioner();
+      }
+      else toast({ message: "Failed to change profile picture" });
+    }
   }
 
   deletePractitioner(practitioner: IPractitioner) {

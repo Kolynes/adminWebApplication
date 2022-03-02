@@ -16,26 +16,31 @@ class OrganizationsClient extends Service implements IOrganizationsClient {
   
   async getCurrent(): Promise<IJsonResponse> {
     const response = await this.http.get("/organizations/current");
-    console.log(response)
     if(response.status == 200)
       this.store.instance.commit("OrganizationModule/setOrganization", response.data);
     return response;
   }
+
   getOrders(): Promise<IJsonResponse> {
     throw new Error("Method not implemented.");
   }
+
   getProducts(): Promise<IJsonResponse> {
     throw new Error("Method not implemented.");
   }
+
   createProduct(): Promise<IJsonResponse> {
     throw new Error("Method not implemented.");
   }
+
   updateProduct(): Promise<IJsonResponse> {
     throw new Error("Method not implemented.");
   }
+
   getDashboard(): Promise<IJsonResponse> {
     throw new Error("Method not implemented.");
   }
+  
   updateOrganization(): Promise<IJsonResponse> {
     throw new Error("Method not implemented.");
   }

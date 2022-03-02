@@ -71,8 +71,10 @@ export default class OrganizationDetails extends Vue {
     if(file !== null) {
       toast({ loading: true, message: "Changing profile picture..."})
       const response = await this.organizationsClient.changeProfilePhoto(id, file);
-      if(response.status == 200)
+      if(response.status == 200) {
         toast({ message: "Profile picture changed" });
+        this.getOrganization();
+      }
       else toast({ message: "Failed to change profile picture" });
     }
   }

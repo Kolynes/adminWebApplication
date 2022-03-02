@@ -18,10 +18,4 @@ export default class AdminModule extends VuexModule {
         localStorage.getItem("admin")!
       );
   }
-
-  @Mutation
-  clear() {
-    localStorage.clear();
-    this.admin = undefined;
-  }
 }

@@ -49,7 +49,7 @@ class AuthClient extends Service implements IAuthClient {
   }
 
   async logout(): Promise<boolean> {
-    this.store.instance.commit("AdminModule/clear")
+    this.store.instance.commit("AccountModule/clear")
     return true;
   }
 }

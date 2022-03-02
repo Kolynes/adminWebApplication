@@ -17,7 +17,11 @@
       <v-flex xs6>
         <v-card style="overflow: hidden">
           <v-layout align-center>
-            <v-img :src="practitioner.profilePhoto" width="300" height="300" />
+            <profile-photo
+              :src="practitioner.profilePhoto"
+              width="300"
+              @click="changeProfilePhoto(practitioner.id)"
+            />
             <v-card-text>
               <p class="font-weight-bold caption mb-0">Email</p>
               <p class="body-1">{{ practitioner.email }}</p>
@@ -77,7 +81,7 @@
               <v-icon class="mr-2">mdi-lead-pencil</v-icon>
               Edit {{ typeText }}
             </v-btn>
-            <br>
+            <br />
             <v-btn
               rounded
               text
@@ -90,7 +94,7 @@
               <v-icon class="mr-2">mdi-check</v-icon>
               Complete {{ typeText }} Identification
             </v-btn>
-            <br>
+            <br />
             <v-btn
               rounded
               text
@@ -103,7 +107,7 @@
               <v-icon class="mr-2">mdi-check-all</v-icon>
               Verify {{ typeText }}
             </v-btn>
-            <br>
+            <br />
             <v-btn
               rounded
               text
@@ -155,7 +159,12 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <practitioner-editor ref="practitionerEditor" @saved="getPractitioner" :type="type"/>
+    <practitioner-editor
+      ref="practitionerEditor"
+      @saved="getPractitioner"
+      :type="type"
+    />
+    <file-getter ref="fileGetter" />
   </v-container>
 </template>
 

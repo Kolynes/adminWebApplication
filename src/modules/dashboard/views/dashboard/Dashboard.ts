@@ -17,7 +17,7 @@ const AdminModule = namespace("AdminModule");
   },
   beforeRouteEnter(to, from, next) {
     const storeService = ServiceProvider.getInstance().getService<IStoreService>(EServices.store);
-    if(storeService.instance.state.AdminModule.admin != undefined)
+    if(storeService.instance.state.AccountModule.account != undefined)
       next();
     else next("/login");
   }
