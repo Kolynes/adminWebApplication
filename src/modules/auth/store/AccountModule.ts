@@ -16,6 +16,12 @@ export default class AccountModule extends VuexModule {
   }
 
   @Mutation
+  setUserSubType(subtype: any) {
+    this.account!.userSubType = subtype;
+    localStorage.setItem("account", JSON.stringify(this.account));
+  }
+
+  @Mutation
   getAccount() {
     if(localStorage.getItem("account") != null)
       this.account = JSON.parse(

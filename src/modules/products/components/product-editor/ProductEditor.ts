@@ -7,11 +7,13 @@ import { EDrugTypes, EProductTypes, IProduct, IProductEditor, IProductsClient } 
 import { EServices } from "@/types";
 import { drugTypeTexts, productTypeTextPlurals, productTypeTexts } from "../../constants";
 import { organizationTypeRoutes, organizationTypeTextsByProductType } from "@/modules/organizations/constants";
-import { ISelectOrganization } from "@/modules/organizations/types";
+import { IOrganization, ISelectOrganization } from "@/modules/organizations/types";
 import VFileField from "@/vuetify-extensions/VFileField.vue";
 import SelectOrganization from "@/modules/organizations/components/select-organization/SelectOrganization";
+import { EUserType, IAccount } from "@/modules/auth/types";
 
-const AdminModule = namespace("AdminModule");
+const AccountModule = namespace("AccountModule");
+const OrganizationModule = namespace("OrganizationModule");
 
 @Component({
   components: {
@@ -29,8 +31,11 @@ export default class ProductEditor extends Vue implements IProductEditor {
   @service(EServices.products)
   productsClient!: IProductsClient;
 
-  @AdminModule.Getter
-  isSuperAdmin!: boolean;
+  @AccountModule.State
+  account!: IAccount;
+
+  @OrganizationModule.State
+  organization!: IOrganization;
 
   createProductDialogVisible = false;
   name = "";
@@ -129,7 +134,7 @@ export default class ProductEditor extends Vue implements IProductEditor {
 
   async createProduct() {
     if (this.createProductForm.validate()) {
-      if (this.isSuperAdmin) {
+      if (this.account.userType == EUserType.admin) {
         this.createProductForOrganization();
         return;
       }

@@ -39,6 +39,7 @@ export interface IUser {
 
 export interface IAccount {
   userType: EUserType;
+  userSubType?: any;
   id: number;
   email: string;
   token: string;

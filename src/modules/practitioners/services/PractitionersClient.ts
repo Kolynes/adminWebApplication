@@ -111,7 +111,12 @@ class PractitionersClient extends Service implements IPractitonersClient {
 
   @throws("Failed to get current practitioner")
   async getCurrent(): Promise<IJsonResponse> {
-    return await this.http.get("/practitioners/current");
+    const response = await this.http.get("/practitioners/current");
+    if(response.status == 200) {
+      this.store.instance.commit("PractitionerModule/setPractitioner", response.data);
+      this.store.instance.commit("AccountModule/setUserSubType", response.data.practitionerType2);
+    }
+    return response;
   }
 
   async logout(): Promise<boolean> {

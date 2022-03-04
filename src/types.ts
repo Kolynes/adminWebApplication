@@ -20,5 +20,6 @@ export enum EServices {
   practitioners,
   adminDashboard,
   settings,
-  organizations
+  organizations,
+  router
 }

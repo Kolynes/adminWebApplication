@@ -6,7 +6,7 @@
           <img src="@/assets/images/logoAndName.svg" style="width: 200px" />
         </center>
         <v-list shaped>
-          <template v-for="(routeHeading, x) in routes">
+          <template v-for="(routeHeading, x) in routesFiltered">
             <v-layout
               :key="`subheader-${x}`"
               justify-space-between

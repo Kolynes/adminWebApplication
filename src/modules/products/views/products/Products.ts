@@ -7,6 +7,12 @@ import { service } from "@/utils/services/ServiceProvider";
 import { EServices } from "@/types";
 import { drugTypeTexts, productTypeTextPlurals, productTypeTexts } from "../../constants";
 import { organizationTypeRoutes } from "@/modules/organizations/constants";
+import { EUserType, IAccount } from "@/modules/auth/types";
+import { namespace } from "vuex-class";
+import { IOrganization } from "@/modules/organizations/types";
+
+const AccountModule = namespace("AccountModule");
+const OrganizationModule = namespace("OrganizationModule");
 
 @Component({
   components: {
@@ -20,7 +26,7 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
     required: true
   })
   type!: EProductTypes;
-  
+
   headers = [
     {
       text: "ID",
@@ -44,6 +50,12 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
     },
   ];
   items = [];
+
+  @AccountModule.State
+  account!: IAccount;
+
+  @OrganizationModule.State
+  organization!: IOrganization;
 
   @Ref()
   productEditor!: IProductEditor;
@@ -73,12 +85,12 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
 
   deleteProduct(product: IProduct) {
     confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` }).then(async (result: boolean) => {
-      if(result) {
+      if (result) {
         toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
         const response = await this.productsClient.deleteProduct(product.id);
         toast(false);
-        if(response.status == 200) {
-          toast({ message: `${this.typeText} deleted`});
+        if (response.status == 200) {
+          toast({ message: `${this.typeText} deleted` });
           this.search();
         }
         else toast({ message: response.errors!.summary });
@@ -87,13 +99,21 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
   }
 
   async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IProduct>> {
-    const response = await this.productsClient.getProducts(
-      this.type,
-      searchString, 
-      page, 
-      pageSize
-    );
-    if(response.status == 200) {
+    const response = this.account.userType == EUserType.organization
+      ? await this.productsClient.getProductsByOrganization(
+        this.organization.id,
+        this.type,
+        searchString,
+        page,
+        pageSize
+      )
+      : await this.productsClient.getProducts(
+        this.type,
+        searchString,
+        page,
+        pageSize
+      );
+    if (response.status == 200) {
       return {
         items: response.data,
         numberOfPages: response.numberOfPages || 0

@@ -7,14 +7,17 @@ import organizationsRoutes from "@/modules/organizations/routes";
 import practitionersRoutes from "@/modules/practitioners/routes"
 import ridesRoutes from "@/modules/rides/routes";
 import tripsRoutes from "@/modules/trips/routes";
+import productsRoutes from "@/modules/products/routes";
 
 export default [
   {
     path: "/dashboard",
+    name: "dashboard",
     component: () =>
       import("@/modules/dashboard/views/dashboard/Dashboard.vue"),
     props: route => route.query,
     redirect: "/dashboard/home",
+    meta: { requiresAuth: true },
     children: [
       {
         path: "/dashboard/home",
@@ -35,6 +38,7 @@ export default [
       ...organizationsRoutes,
       ...practitionersRoutes,
       ...ridesRoutes,
+      ...productsRoutes,
       ...tripsRoutes
     ]
   }

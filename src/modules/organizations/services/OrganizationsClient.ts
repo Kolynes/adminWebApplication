@@ -16,8 +16,10 @@ class OrganizationsClient extends Service implements IOrganizationsClient {
   
   async getCurrent(): Promise<IJsonResponse> {
     const response = await this.http.get("/organizations/current");
-    if(response.status == 200)
+    if(response.status == 200) {
       this.store.instance.commit("OrganizationModule/setOrganization", response.data);
+      this.store.instance.commit("AccountModule/setUserSubType", response.data.organizationType);
+    }
     return response;
   }
 

@@ -25,7 +25,7 @@
                   label="Name"
                   outlined
                   v-model="name"
-                  :rules="[requiredLengthRule(6)]"
+                  :rules="[requiredRule]"
                 />
                 <v-textarea
                   label="Description"
@@ -33,7 +33,7 @@
                   prepend-inner-icon="mdi-note-text"
                   v-model="description"
                   type="phone"
-                  :rules="[requiredLengthRule(0, 500)]"
+                  :rules="[requiredLengthRule(0, 1000)]"
                 />
                 <v-layout>
                   <v-flex xs6>

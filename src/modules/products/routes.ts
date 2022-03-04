@@ -1,4 +1,6 @@
 import { RouteConfig } from "vue-router";
+import { EUserType } from "../auth/types";
+import { EOrganizationTypes } from "../organizations/types";
 import { EProductTypes } from "./types";
 
 export default [
@@ -10,6 +12,10 @@ export default [
       route.query.type = EProductTypes.drug;
       return route.query;
     },
+    meta: { 
+      excludedUserTypes: [EUserType.practitioner], 
+      excludedUserSubTypes: [EOrganizationTypes.OEM]
+    }
   },
   {
     path: "/dashboard/drugs/details",
@@ -18,6 +24,10 @@ export default [
     props: route => {
       route.query.type = EProductTypes.drug;
       return route.query;
+    },
+    meta: { 
+      excludedUserTypes: [EUserType.practitioner], 
+      excludedUserSubTypes: [EOrganizationTypes.OEM] 
     }
   },
   {
@@ -28,6 +38,10 @@ export default [
       route.query.type = EProductTypes.equipment;
       return route.query;
     },
+    meta: { 
+      excludedUserTypes: [EUserType.practitioner], 
+      excludedUserSubTypes: [EOrganizationTypes.pharmacy]
+    }
   },
   {
     path: "/dashboard/equipment/details",
@@ -36,6 +50,10 @@ export default [
     props: route => {
       route.query.type = EProductTypes.equipment;
       return route.query;
+    },
+    meta: { 
+      excludedUserTypes: [EUserType.practitioner], 
+      excludedUserSubTypes: [EOrganizationTypes.pharmacy]
     }
   },
 ] as RouteConfig[];
