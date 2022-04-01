@@ -14,6 +14,7 @@ export interface IOrganization {
   profilePhoto: string;
   description: string;
   location: ILocation;
+  city: string;
   phoneNumber: string;
   organizationType: EOrganizationTypes;
 }

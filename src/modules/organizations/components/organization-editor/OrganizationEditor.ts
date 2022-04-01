@@ -69,6 +69,7 @@ export default class OrganizationEditor extends Mixins(GooglePlacesAPIMixin, Net
     this.prediction = this.predictions.find(el => el.description.includes(organization.location.address)) || null;
     this.description = organization.description;
     this.selectedOrganization = organization.id;
+    this.city = organization.city;
     await this.toggleCreateOrganizationDialog();
     setTimeout(
       () => {
