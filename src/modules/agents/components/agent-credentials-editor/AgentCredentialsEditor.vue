@@ -18,14 +18,14 @@
             prepend-inner-icon="mdi-email"
             v-model="email"
             :rules="[emailRule]"
-            :error-messages="emailErrors"
+            :error-messages="errorFields.email"
             outlined
           />
           <v-password-field
             label="Password"
             prepend-inner-icon="mdi-lock"
             v-model="password"
-            :error-messages="passwordErrors"
+            :error-messages="errorFields.password"
             outlined
           />
           <v-btn
@@ -33,7 +33,7 @@
             color="primary"
             rounded
             elevation="0"
-            :loading="updating"
+            :loading="loading.updateAgentCredentials"
             type="submit"
           >
             update Agent

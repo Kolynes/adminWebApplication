@@ -5,6 +5,7 @@ import { EServices } from "@/types";
 import { IAdminRidesClient, IRide, IRideEditor, ISelectRide } from "../../types";
 import ILoaderResponse from "@/utils/types/ILoaderResponse";
 import RideEditor from "../ride-editor/RideEditor";
+import { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -16,7 +17,6 @@ export default class SelectRide extends Vue implements ISelectRide {
   showDialog = false;
   searchString = "";
   refresh = false;
-  searching = false;
   searchTimeout: number | null = null;
   rideResolve: Function | null = null;
 
@@ -36,30 +36,28 @@ export default class SelectRide extends Vue implements ISelectRide {
     });
   }
 
-  async loadRides(page: number): Promise<ILoaderResponse<IRide>> {
-    this.searching = true;
+  @throwsNetworkError()
+  async loadRides(page: number): Promise<ILoaderResponse> {
     const response = await this.ridesClient.getRides(
       this.searchString || "",
       page,
       100
     );
-    this.searching = false;
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        hasNextPage: response.hasNextPage as boolean
-      };
-    }
-    else return {
-      items: [],
-      hasNextPage: false
+    return {
+      items: response.data,
+      hasNextPage: response.hasNextPage as boolean
     };
   }
 
   @Watch("searchString")
   onSearchStringChanged() {
-    if(this.searchTimeout != null)
+    if (this.searchTimeout != null)
       clearTimeout(this.searchTimeout)
     this.searchTimeout = setTimeout(() => this.refresh = true, 500)
+  }
+
+  @Watch("error.loadRides")
+  onError(value: string) {
+    if(value) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message: value });
   }
 }

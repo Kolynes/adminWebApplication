@@ -1,4 +1,4 @@
-import { Component, Vue, Prop, Ref } from "vue-property-decorator";
+import { Component, Vue, Prop, Ref, Mixins, Watch } from "vue-property-decorator";
 import FileGetter from "@/components/file-getter/FileGetter.vue";
 import ProfilePhoto from "@/components/ProfilePhoto.vue";
 import VEmptyState from "@/vuetify-extensions/VEmptyState.vue";
@@ -9,6 +9,8 @@ import { service } from "@/utils/services/ServiceProvider";
 import { typeTextPlurals, typeTexts } from "../../constants";
 import PractitionerEditor from "../../components/practitioner-editor/PractitionerEditor";
 import { IFileGetter } from "@/components/file-getter/FileGetter";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
+import IIndexable from "@/utils/types/IIndexable";
 
 @Component({
   components: {
@@ -18,7 +20,7 @@ import { IFileGetter } from "@/components/file-getter/FileGetter";
     PractitionerEditor
   }
 })
-export default class PractitionerDetails extends Vue {
+export default class PractitionerDetails extends Mixins(NetworkManagerMixin) {
   @Prop({
     type: Number,
     required: true
@@ -48,70 +50,72 @@ export default class PractitionerDetails extends Vue {
     return typeTextPlurals[this.type];
   }
 
-  loading = true;
+  loading: IIndexable<boolean> = {
+    getPractitioner: true
+  };
   practitioner: IPractitioner | null = null;
 
   datetime = datetime;
 
+  @throwsNetworkError()
   async getPractitioner() {
     const response = await this.practitionersClient.getPractitioner(this.id);
-    this.loading = false;
-    if(response.status == 200) {
-      this.practitioner = response.data;
-    }
-    else toast({ message: `${this.typeText} not found` });
+    this.practitioner = response.data;
   }
 
+  @throwsNetworkError()
   async verifyPractitioner() {
-    const result = await confirm({ icon: "mdi-check-all", title: `Verify ${this.typeText.toLowerCase()}`});
-    if(!result) return;
+    const result = await confirm({ icon: "mdi-check-all", title: `Verify ${this.typeText.toLowerCase()}` });
+    if (!result) return;
     toast({ loading: true, message: `Verifying ${this.typeText.toLowerCase()}...` });
-    const response = await this.practitionersClient.verifyPractitioner(this.id);
+    await this.practitionersClient.verifyPractitioner(this.id);
     toast(false);
-    if(response.status == 200) toast({ message: `${this.typeText} verified`});
-    else toast({ message: response.errors!.summary });
+    toast({ icon: "mdi-check", iconColor: "green", message: `${this.typeText} verified` });
+    this.getPractitioner();
   }
 
+  @throwsNetworkError()
   async completeIdentification() {
-    const result = await confirm({ icon: "mdi-check", title: `Complete ${this.typeText.toLowerCase()} identification`});
-    if(!result) return;
+    const result = await confirm({ icon: "mdi-check", title: `Complete ${this.typeText.toLowerCase()} identification` });
+    if (!result) return;
     toast({ loading: true, message: `Completing ${this.typeText.toLowerCase()} identification...` });
-    const response = await this.practitionersClient.completeIdentifcation(this.id);
+    await this.practitionersClient.completeIdentifcation(this.id);
     toast(false);
-    if(response.status == 200) toast({ message: `${this.typeText} identification completed`});
-    else toast({ message: response.errors!.summary });
+    toast({ icon: "mdi-check", iconColor: "green", message: `${this.typeText} identification completed` });
+    this.getPractitioner();
   }
 
+  @throwsNetworkError()
   async changeProfilePhoto(id: number) {
     const file = await this.fileGetter.getFile("image/*", 1 * 1024 * 1024);
-    if(file !== null) {
-      toast({ loading: true, message: "Changing profile picture..."})
-      const response = await this.practitionersClient.changeProfilePhoto(id, file);
-      if(response.status == 200) {
-        toast({ message: "Profile picture changed" });
-        this.getPractitioner();
-      }
-      else toast({ message: "Failed to change profile picture" });
-    }
+    if (!file) return;
+    toast({ loading: true, message: "Changing profile picture..." })
+    await this.practitionersClient.changeProfilePhoto(id, file);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Profile picture changed" });
+    this.getPractitioner();
   }
 
-  deletePractitioner(practitioner: IPractitioner) {
-    confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
-        const response = await this.practitionersClient.deletePractitioner(practitioner.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: `${this.typeText} deleted`});
-          this.$router.back();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deletePractitioner(practitioner: IPractitioner) {
+    const result = await confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` });
+    if(!result) return;
+    toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
+    await this.practitionersClient.deletePractitioner(practitioner.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: `${this.typeText} deleted` });
+    this.$router.back();
+  }
+
+  @Watch("error.getPractitioner")
+  @Watch("error.verifyPractitioner")
+  @Watch("error.completeIdentification")
+  @Watch("error.changeProfilePhoto")
+  @Watch("error.deletePractitioner")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 
   mounted() {
     this.getPractitioner();
   }
-
 }

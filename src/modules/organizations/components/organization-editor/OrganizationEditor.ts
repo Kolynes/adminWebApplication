@@ -1,13 +1,15 @@
 import IVForm from "@/utils/types/IVForm";
 import { emailRule, requiredLengthRule, requiredRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
-import { Component, Ref, Prop, Mixins } from "vue-property-decorator";
+import { Component, Ref, Prop, Mixins, Watch } from "vue-property-decorator";
 import { EOrganizationTypes, IAdminOrganizationsClient, IOrganization, IOrganizationEditor } from "@/modules/organizations/types";
 import { EServices } from "@/types";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";
 import VFileField from "@/vuetify-extensions/VFileField.vue";
 import { organizationTypeTexts } from "../../constants";
 import GooglePlacesAPIMixin from "@/mixins/GooglePlacesAPIMixin";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
+import { IAdminSettingsClient } from "@/modules/admins/types";
 
 @Component({
   components: {
@@ -15,7 +17,7 @@ import GooglePlacesAPIMixin from "@/mixins/GooglePlacesAPIMixin";
     VFileField,
   }
 })
-export default class OrganizationEditor extends Mixins(GooglePlacesAPIMixin) implements IOrganizationEditor {
+export default class OrganizationEditor extends Mixins(GooglePlacesAPIMixin, NetworkManagerMixin) implements IOrganizationEditor {
   @Prop({
     type: String,
     required: true
@@ -25,6 +27,9 @@ export default class OrganizationEditor extends Mixins(GooglePlacesAPIMixin) imp
   @service(EServices.adminOrganizations)
   organizationsClient!: IAdminOrganizationsClient;
 
+  @service(EServices.settings)
+  adminSettingsClient!: IAdminSettingsClient;
+
   createOrganizationDialogVisible = false;
   name = "";
   email = "";
@@ -32,9 +37,9 @@ export default class OrganizationEditor extends Mixins(GooglePlacesAPIMixin) imp
   description = "";
   phoneNumber = "";
   password = "";
-  creatingOrganization = false;
   selectedOrganization: number | null = null;
-  errors = {};
+  cities = [];
+  city = "";
 
   @Ref()
   createOrganizationForm!: IVForm;
@@ -78,61 +83,59 @@ export default class OrganizationEditor extends Mixins(GooglePlacesAPIMixin) imp
     );
   }
 
+  @throwsNetworkError()
   async editOrganization() {
-    if (this.createOrganizationForm.validate()) {
-      this.errors = {};
-      this.creatingOrganization = true;
-      const response = await this.organizationsClient.updateOrganization(
-        this.selectedOrganization!,
-        this.name,
-        this.email,
-        this.description,
-        this.address,
-        this.phoneNumber,
-        this.latitude!,
-        this.longitude!
-      );
-      this.creatingOrganization = false;
-      if (response.status == 200) {
-        toast({ message: this.organizationTypeText + " updated" });
-        this.$emit("saved");
-        this.toggleCreateOrganizationDialog();
-        this.selectedOrganization = null
-      }
-      else {
-        toast({ message: response.errors!.summary });
-        this.errors = response.errors!.fields;
-      }
-    }
+    if (!this.createOrganizationForm.validate()) return;
+    await this.organizationsClient.updateOrganization(
+      this.selectedOrganization!,
+      this.name,
+      this.email,
+      this.description,
+      this.address,
+      this.city,
+      this.phoneNumber,
+      this.latitude!,
+      this.longitude!
+    );
+    toast({ message: this.organizationTypeText + " updated" });
+    this.$emit("saved");
+    this.toggleCreateOrganizationDialog();
   }
 
+  @throwsNetworkError()
   async createOrganization() {
-    if (this.createOrganizationForm.validate()) {
-      this.errors = {};
-      this.creatingOrganization = true;
-      const response = await this.organizationsClient.createOrganization(
-        this.name,
-        this.email,
-        this.description,
-        this.address,
-        this.phoneNumber,
-        this.profilePhoto as File,
-        this.latitude!,
-        this.longitude!,
-        this.type!,
-        this.password
-      );
-      this.creatingOrganization = false;
-      if (response.status == 201 || response.status == 200) {
-        toast({ message: this.organizationTypeText + " created" });
-        this.$emit("saved");
-        this.toggleCreateOrganizationDialog()
-        this.selectedOrganization = null
-      }
-      else {
-        toast({ message: response.errors!.summary });
-        this.errors = response.errors!.fields;
-      }
-    }
+    if (!this.createOrganizationForm.validate()) return;
+    await this.organizationsClient.createOrganization(
+      this.name,
+      this.email,
+      this.description,
+      this.address,
+      this.city,
+      this.phoneNumber,
+      this.profilePhoto as File,
+      this.latitude!,
+      this.longitude!,
+      this.type!,
+      this.password
+    );
+    toast({ message: this.organizationTypeText + " created" });
+    this.$emit("saved");
+    this.toggleCreateOrganizationDialog()
+  }
+
+  @throwsNetworkError()
+  async getCities() {
+    const response = await this.adminSettingsClient.getCities();
+    this.cities = response.data.map((city: string) => city.toUpperCase());
+  }
+
+  @Watch("error.createOrganization")
+  @Watch("error.editOrganization")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
+  }
+
+  mounted() {
+    this.getCities();
   }
 }

@@ -1,9 +1,10 @@
 import Service from "../services/Service";
 import { delay } from "../time";
 import EContentTypes from "../types/EContentTypes";
-import IIndexableObject from "../types/IIndexableObject";
+import IIndexableObject from "../types/IIndexable";
 import IJsonResponse from "../types/IJsonResponse";
 import IJsonResponseClient, { JsonResponseAdapter } from "../types/IJsonResponseClient";
+import JsonResponseErrors from "./JsonResponseErrors";
 
 export default class JsonResponseClient extends Service implements IJsonResponseClient {
   protected baseUrl: string = "";
@@ -34,12 +35,21 @@ export default class JsonResponseClient extends Service implements IJsonResponse
     }
     if (body instanceof Object && contentType != EContentTypes.multipart && files === undefined)
       processedHeaders["content-type"] = EContentTypes.json;
-    const response = await fetch(this.buildUrl(url), {
-      method,
-      headers: processedHeaders,
-      body: this.buildBody(method, body, files, contentType),
-    });
-    return await this.jsonResponseAdapter(response);
+    let response;
+    let errors: JsonResponseErrors | undefined;
+    try {
+      response = await fetch(this.buildUrl(url), {
+        method,
+        headers: processedHeaders,
+        body: this.buildBody(method, body, files, contentType),
+      });
+    } finally {
+      const adaptedResponse = await this.jsonResponseAdapter(response, errors);
+      console.log(adaptedResponse)
+      if (adaptedResponse.status < 200 || adaptedResponse.status > 299)
+        throw adaptedResponse;
+      return adaptedResponse;
+    }
   }
 
   private buildBody(

@@ -3,12 +3,13 @@ import { EServices } from "@/types";
 import { emailRule, requiredLengthRule, requiredRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
 import IVForm from "@/utils/types/IVForm";
-import { Component, Prop, Mixins, Ref } from "vue-property-decorator";
+import { Component, Prop, Mixins, Ref, Watch } from "vue-property-decorator";
 import { identicationTypes, typeTextPlurals, typeTexts, verificationTypes } from "../../constants";
 import { EIdentificationTypes, EPractitionerTypes, EVerificationTypes, IAdminPractitionersClient, IPractitioner, IPractitionerEditor } from "../../types";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";
 import VFileField from "@/vuetify-extensions/VFileField.vue";
 import { IAdminSettingsClient } from "@/modules/admins/types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -16,7 +17,7 @@ import { IAdminSettingsClient } from "@/modules/admins/types";
     VFileField
   }
 })
-export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) implements IPractitionerEditor {
+export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin, NetworkManagerMixin) implements IPractitionerEditor {
   @Prop({
     type: String,
     default: EPractitionerTypes.doctor
@@ -38,10 +39,7 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
   password = "";
   selectedPractitioner: number | null = null;
   dialogVisible = false;
-  errors = {};
-  creatingPractitioner = false;
   cities = [];
-  loadingCities = false;
   city = "";
 
   @Ref()
@@ -63,23 +61,23 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
 
   get verificationTypeOptions() {
     return Object.keys(verificationTypes)
-    .map(
-      key => ({key, value: Object.getOwnPropertyDescriptor(verificationTypes, key)!.value})
-    );
+      .map(
+        key => ({ key, value: Object.getOwnPropertyDescriptor(verificationTypes, key)!.value })
+      );
   }
 
   get identificationTypeOptions() {
     return Object.keys(identicationTypes)
-    .map(
-      key => ({key, value: Object.getOwnPropertyDescriptor(identicationTypes, key)!.value})
-    );
+      .map(
+        key => ({ key, value: Object.getOwnPropertyDescriptor(identicationTypes, key)!.value })
+      );
   }
 
   emailRule = emailRule;
   requiredLengthRule = requiredLengthRule;
   requiredRule = requiredRule;
 
-  toggleCreatePractitionerDialog(edit: boolean = false) {
+  toggleCreatePractitionerDialog() {
     this.dialogVisible = !this.dialogVisible;
     if (!this.dialogVisible) {
       this.practitionerEditorForm.reset();
@@ -98,7 +96,7 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
     this.companyName = practitioner.companyName;
     this.city = practitioner.city;
     this.toggleCreatePractitionerDialog();
-    if(practitioner.location) {
+    if (practitioner.location) {
       await this.onEnterAddress(practitioner.location.address);
       this.prediction = this.predictions.find(el => el.description.includes(practitioner.location.address)) || null;
     }
@@ -115,10 +113,10 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
     );
   }
 
+  @throwsNetworkError()
   async createPractitioner() {
-    if(!this.practitionerEditorForm.validate()) return;
-    this.creatingPractitioner = true;
-    const response = await this.adminPractitionersClient.createPractitioner(
+    if (!this.practitionerEditorForm.validate()) return;
+    await this.adminPractitionersClient.createPractitioner(
       this.name,
       this.email,
       this.phoneNumber,
@@ -138,21 +136,15 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
       this.profilePhoto!,
       this.password
     );
-    this.creatingPractitioner = false;
-    if(response.status == 200) {
-      this.$emit("saved");
-      this.toggleCreatePractitionerDialog();
-      toast({ message: "Practitioner created"});
-    } else {
-      toast({ message: response.errors!.summary });
-      this.errors = response.errors!.fields;
-    }
+    this.$emit("saved");
+    this.toggleCreatePractitionerDialog();
+    toast({ icon: "mdi-check", iconColor: "green", message: "Practitioner created" });
   }
 
-  async updatePractitoner() {
-    if(!this.practitionerEditorForm.validate()) return;
-    this.creatingPractitioner = true;
-    const response = await this.adminPractitionersClient.updatePractitioner(
+  @throwsNetworkError()
+  async updatePractitioner() {
+    if (!this.practitionerEditorForm.validate()) return;
+    await this.adminPractitionersClient.updatePractitioner(
       this.selectedPractitioner!,
       this.name,
       this.email,
@@ -166,28 +158,25 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) imp
       this.latitude!,
       this.longitude!,
     );
-    this.creatingPractitioner = false;
-    if(response.status == 200) {
-      this.$emit("saved");
-      this.toggleCreatePractitionerDialog();
-      toast({ message: "Practitioner updated"});
-    } else {
-      toast({ message: response.errors!.summary });
-      this.errors = response.errors!.fields;
-    }
+    this.$emit("saved");
+    this.toggleCreatePractitionerDialog();
+    toast({ icon: "mdi-check", iconColor: "green", message: "Practitioner updated" });
   }
 
+  @throwsNetworkError()
   async getCities() {
-    this.loadingCities = true;
     const response = await this.adminSettingsClient.getCities();
-    this.loadingCities = false;
-    if(response.status == 200)
-      this.cities = response.data;
-    else toast({ message: "Failed to get cities" });
+    this.cities = response.data.map((city: string) => city.toUpperCase());
+  }
+
+  @Watch("error.createPractitioner")
+  @Watch("error.updatePractitioner")
+  @Watch("error.getCities")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 
   mounted() {
     this.getCities();
   }
-
 }

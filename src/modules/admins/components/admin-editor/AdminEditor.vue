@@ -26,7 +26,7 @@
                   outlined
                   v-model="firstName"
                   :rules="[requiredLengthRule(4)]"
-                  :error-messages="errors.firstName"
+                  :error-messages="errorFields.firstName"
                 />
               </v-flex>
               <v-flex>
@@ -35,7 +35,7 @@
                   outlined
                   v-model="lastName"
                   :rules="[requiredLengthRule(4)]"
-                  :error-messages="errors.lastName"
+                  :error-messages="errorFields.lastName"
                 />
               </v-flex>
             </v-layout>
@@ -46,7 +46,7 @@
               v-model="email"
               type="email"
               :rules="[emailRule]"
-              :error-messages="errors.email"
+              :error-messages="errorFields.email"
             />
             <v-text-field
               label="Phone Number"
@@ -55,7 +55,7 @@
               v-model="phoneNumber"
               type="phone"
               :rules="[requiredLengthRule(10)]"
-              :error-messages="errors.phoneNumber"
+              :error-messages="errorFields.phoneNumber"
             />
             <v-password-field
               label="Password"
@@ -71,7 +71,7 @@
               prepend-inner-icon="mdi-account-star"
               v-model="role"
               :rules="[requiredRule]"
-              :error-messages="errors.role"
+              :error-messages="errorFields.role"
               :items="roles"
             >
               <template #selection="{ item }">
@@ -91,7 +91,7 @@
               multiple
               :item-text="(item) => item.name"
               :item-value="(item) => item"
-              :error-messages="errors.permissions"
+              :error-messages="errorFields.permissions"
             >
               <template #selection="{ item }">
                 <v-chip class="primary caption">
@@ -119,7 +119,7 @@
               rounded
               elevation="0"
               type="submit"
-              :loading="creatingAdmin"
+              :loading="loading.editAdmin || loading.createAdmin"
             >
               {{ selectedAdmin != null ? "Edit" : "Create" }} Admin
             </v-btn>

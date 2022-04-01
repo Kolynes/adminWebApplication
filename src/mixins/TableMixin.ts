@@ -7,16 +7,16 @@ export interface ITableHeader {
   value: string;
 }
 
-export interface ISearchResults<T> {
-  items: T[];
+export interface ISearchResults {
+  items: any[];
   numberOfPages: number;
 }
 
-export interface ITableView<T> {
+export interface ITableView {
   headers: ITableHeader[];
-  items: T[];
-  itemClicked(item: T): void;
-  getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<T>>;
+  items: any[];
+  itemClicked(item: any): void;
+  getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults>;
 }
 
 @Component({
@@ -25,12 +25,11 @@ export interface ITableView<T> {
     VEmptyState,
   }
 })
-export default class TableMixin<T> extends Vue implements ITableView<T> {
+export default class TableMixin extends Vue implements ITableView {
   headers: ITableHeader[] = [];
-  items: T[] = [];
+  items: any[] = [];
 
   searchString = "";
-  loading = false;
   page = 1;
   pageSize = 10;
   numberOfPages = 0;
@@ -54,11 +53,9 @@ export default class TableMixin<T> extends Vue implements ITableView<T> {
   }
 
   async search() {
-    this.loading = true;
     const response = await this.getSearchResults(this.searchString, this.page, this.pageSize);
-    this.loading = false;
-    this.items = response.items;
-    this.numberOfPages = response.numberOfPages;
+    this.items = response.items || this.items;
+    this.numberOfPages = response.numberOfPages || this.numberOfPages;
   }
 
   reset() {
@@ -83,19 +80,14 @@ export default class TableMixin<T> extends Vue implements ITableView<T> {
     this.search();
   }
 
-  @Watch("orderType")
-  onOrderTypeChanged() {
-    this.search();
-  }
-
   mounted() {
     this.search()
   }
 
-  itemClicked(item: T): void {
+  itemClicked(item: any): void {
     throw new Error("Method not implemented.");
   }
-  getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<T>> {
+  getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     throw new Error("Method not implemented.");
   }
 }

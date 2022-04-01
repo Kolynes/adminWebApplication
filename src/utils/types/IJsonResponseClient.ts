@@ -1,7 +1,7 @@
 import JsonResponseErrors from "../http/JsonResponseErrors";
 import Service from "../services/Service";
 import EContentTypes from "./EContentTypes";
-import IIndexableObject from "./IIndexableObject";
+import IIndexableObject from "./IIndexable";
 import IJsonResponse from "./IJsonResponse";
 
 export type JsonResponseAdapter = (baseResponse?: Response, errors?: JsonResponseErrors) => Promise<IJsonResponse>;

@@ -28,7 +28,7 @@
                   outlined
                   v-model="name"
                   :rules="[requiredLengthRule(6)]"
-                  :error-messages="errors.name"
+                  :error-messages="errorFields.name"
                 />
                 <v-text-field
                   label="Email"
@@ -37,7 +37,7 @@
                   v-model="email"
                   type="email"
                   :rules="[emailRule]"
-                  :error-messages="errors.email"
+                  :error-messages="errorFields.email"
                 />
                 <v-textarea
                   label="Description"
@@ -46,7 +46,7 @@
                   v-model="description"
                   type="phone"
                   :rules="[requiredRule]"
-                  :error-messages="errors.description"
+                  :error-messages="errorFields.description"
                 />
                 <v-text-field
                   label="Phone Number"
@@ -55,7 +55,7 @@
                   v-model="phoneNumber"
                   type="phone"
                   :rules="[requiredLengthRule(10)]"
-                  :error-messages="errors.phoneNumber"
+                  :error-messages="errorFields.phoneNumber"
                 />
                 <v-file-field
                   label="Profile Photo"
@@ -63,7 +63,7 @@
                   v-model="profilePhoto"
                   :rules="[requiredRule]"
                   v-if="!selectedOrganization"
-                  :error-messages="errors.profilePhoto"
+                  :error-messages="errorFields.profilePhoto"
                 />
                 <v-password-field
                   label="Password"
@@ -98,6 +98,16 @@
                     <span>{{item.description}}</span>
                   </template>
                 </v-autocomplete>
+                <v-select
+                  label="City"
+                  prepend-inner-icon="mdi-city"
+                  :items="cities"
+                  v-model="city"
+                  :rules="[requiredRule]"
+                  :loading="loading.getCities"
+                  @focus="getCities"
+                  outlined
+                />
                 <div ref="mapElement" style="height: 400px"></div>
               </v-flex>
             </v-layout>
@@ -107,7 +117,7 @@
               rounded
               elevation="0"
               type="submit"
-              :loading="creatingOrganization"
+              :loading="loading.createOrganization ||  loading.editOrganization"
             >
               {{ selectedOrganization != null ? "Edit" : "Create" }}
               {{ organizationTypeText }}

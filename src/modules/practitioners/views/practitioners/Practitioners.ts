@@ -6,6 +6,7 @@ import { EServices } from "@/types";
 import { service } from "@/utils/services/ServiceProvider";
 import { typeTextPlurals, typeTexts } from "../../constants";
 import PractitionerEditor from "../../components/practitioner-editor/PractitionerEditor";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -13,7 +14,7 @@ import PractitionerEditor from "../../components/practitioner-editor/Practitione
     PractitionerEditor
   }
 })
-export default class Practitioners extends Mixins(TableMixin) implements ITableView<IPractitioner> {
+export default class Practitioners extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
   @Prop({
     type: String,
     default: EPractitionerTypes.doctor
@@ -33,7 +34,7 @@ export default class Practitioners extends Mixins(TableMixin) implements ITableV
   get typeTextPlural(): string {
     return typeTextPlurals[this.type];
   }
-  
+
   headers = [
     {
       text: "ID",
@@ -56,46 +57,33 @@ export default class Practitioners extends Mixins(TableMixin) implements ITableV
       value: "companyName"
     }
   ];
-  items = [];
 
   itemClicked(practitioner: IPractitioner) {
     this.$router.push(`/dashboard/${this.typeTextPlural.toLowerCase()}/details?id=${practitioner.id}`);
   }
 
-  deletePractitioner(practitioner: IPractitioner) {
-    confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
-        const response = await this.practitionersClient.deletePractitioner(practitioner.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: `${this.typeText} deleted`});
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deletePractitioner(practitioner: IPractitioner) {
+    const result = await confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` });
+    if (!result) return;
+    toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
+    await this.practitionersClient.deletePractitioner(practitioner.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: `${this.typeText} deleted` });
+    this.search();
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IPractitioner>> {
+  @throwsNetworkError()
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = await this.practitionersClient.getPractitioners(
       this.type,
-      searchString, 
-      page, 
+      searchString,
+      page,
       pageSize
     );
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
-    }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
   }
 
@@ -103,5 +91,11 @@ export default class Practitioners extends Mixins(TableMixin) implements ITableV
   onTypeChange() {
     this.items = [];
     this.search();
+  }
+
+  @Watch("error.deletePractitioner")
+  @Watch("error.getSearchResults")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }

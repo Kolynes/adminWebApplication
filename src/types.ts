@@ -21,5 +21,7 @@ export enum EServices {
   adminDashboard,
   settings,
   organizations,
-  router
+  router,
+  payments,
+  clicks
 }

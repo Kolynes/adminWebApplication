@@ -6,13 +6,14 @@ import { service } from "@/utils/services/ServiceProvider";
 import { EServices } from "@/types";
 import { statusChipClasses } from "../../constants";
 import { datetime } from "@/utils/time";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
     TableView
   }
 })
-export default class Trips extends Mixins(TableMixin) implements ITableView<ITrip> {
+export default class Trips extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
   headers = [
     {
       text: "ID",
@@ -40,54 +41,46 @@ export default class Trips extends Mixins(TableMixin) implements ITableView<ITri
     },
   ];
   statusChipClasses = statusChipClasses;
-  items = [];
   status: ETripStatus | "" = "";
-
 
   @service(EServices.adminTrips)
   tripsClient!: IAdminTripsClient;
-  
+
   datetime = datetime;
-  
+
   itemClicked(trip: ITrip) {
     this.$router.push(`/dashboard/trips/details?id=${trip.id}`);
   }
 
-
+  @throwsNetworkError()
   async deleteTrip(trip: ITrip) {
     const result = await confirm({ title: "Delete Trip", icon: "mdi-map" });
-    if (!result)
-      return;
-    toast({ loading: true, message: "Deleting trip..."});
-    const response = await this.tripsClient.deleteTrip(trip.id);
+    if (!result) return;
+    toast({ loading: true, message: "Deleting trip..." });
+    await this.tripsClient.deleteTrip(trip.id);
     toast(false);
-    if(response.status == 200) {
-      toast({ message: "Deleted trip" });
-      this.search();
-    } 
-    else toast({ message: response.errors!.summary });
+    toast({ icon: "mdi-check", iconColor: "green", message: "Deleted trip" });
+    this.search();
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<ITrip>> {
+  @throwsNetworkError("Failed to get trips. Please check your network")
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = await this.tripsClient.getTrips(
       this.status,
-      searchString, 
-      page, 
+      searchString,
+      page,
       pageSize
     );
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
-    }
+  }
+
+  @Watch("error.deleteTrip")
+  @Watch("error.getSearchResults")
+  onError(value: string) {
+    if (value) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message: value });
   }
 
   @Watch("status")

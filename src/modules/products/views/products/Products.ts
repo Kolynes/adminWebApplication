@@ -10,6 +10,7 @@ import { organizationTypeRoutes } from "@/modules/organizations/constants";
 import { EUserType, IAccount } from "@/modules/auth/types";
 import { namespace } from "vuex-class";
 import { IOrganization } from "@/modules/organizations/types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 const AccountModule = namespace("AccountModule");
 const OrganizationModule = namespace("OrganizationModule");
@@ -20,7 +21,7 @@ const OrganizationModule = namespace("OrganizationModule");
     ProductEditor
   }
 })
-export default class Products extends Mixins(TableMixin) implements ITableView<IProduct> {
+export default class Products extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
   @Prop({
     type: String,
     required: true
@@ -49,7 +50,6 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
       value: "quantityInStock"
     },
   ];
-  items = [];
 
   @AccountModule.State
   account!: IAccount;
@@ -83,22 +83,19 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
     this.$router.push(`/dashboard/${this.typeTextPlural.toLowerCase()}/details?id=${product.id}`);
   }
 
-  deleteProduct(product: IProduct) {
-    confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` }).then(async (result: boolean) => {
-      if (result) {
-        toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
-        const response = await this.productsClient.deleteProduct(product.id);
-        toast(false);
-        if (response.status == 200) {
-          toast({ message: `${this.typeText} deleted` });
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deleteProduct(product: IProduct) {
+    const result = await confirm({ icon: "mdi-delete", title: `Delete ${this.typeText}` });
+    if (!result) return;
+    toast({ loading: true, message: `Deleting ${this.typeText.toLowerCase()}...` });
+    await this.productsClient.deleteProduct(product.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: `${this.typeText} deleted` });
+    this.search();
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IProduct>> {
+  @throwsNetworkError()
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = this.account.userType == EUserType.organization
       ? await this.productsClient.getProductsByOrganization(
         this.organization.id,
@@ -113,18 +110,9 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
         page,
         pageSize
       );
-    if (response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
-    }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
   }
 
@@ -132,5 +120,11 @@ export default class Products extends Mixins(TableMixin) implements ITableView<I
   onTypeChange() {
     this.items = [];
     this.search();
+  }
+
+  @Watch("error.getSearchResults")
+  @Watch("error.deleteProduct")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }

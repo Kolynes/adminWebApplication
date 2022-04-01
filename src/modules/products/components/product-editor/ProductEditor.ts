@@ -1,7 +1,7 @@
 import IVForm from "@/utils/types/IVForm";
 import { emailRule, requiredLengthRule, requiredRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
-import { Vue, Component, Ref, Prop } from "vue-property-decorator";
+import { Component, Ref, Prop, Mixins, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { EDrugTypes, EProductTypes, IProduct, IProductEditor, IProductsClient } from "@/modules/products/types";
 import { EServices } from "@/types";
@@ -11,6 +11,7 @@ import { IOrganization, ISelectOrganization } from "@/modules/organizations/type
 import VFileField from "@/vuetify-extensions/VFileField.vue";
 import SelectOrganization from "@/modules/organizations/components/select-organization/SelectOrganization";
 import { EUserType, IAccount } from "@/modules/auth/types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 const AccountModule = namespace("AccountModule");
 const OrganizationModule = namespace("OrganizationModule");
@@ -21,7 +22,7 @@ const OrganizationModule = namespace("OrganizationModule");
     SelectOrganization
   }
 })
-export default class ProductEditor extends Vue implements IProductEditor {
+export default class ProductEditor extends Mixins(NetworkManagerMixin) implements IProductEditor {
   @Prop({
     type: String,
     default: EProductTypes.drug
@@ -46,7 +47,6 @@ export default class ProductEditor extends Vue implements IProductEditor {
   quantityInStock = 0;
   dosage = ""
   drugType = EDrugTypes.otc;
-  creatingProduct = false;
   selectedProduct: number | null = null;
   drugTypeOptions = [
     EDrugTypes.otc,
@@ -64,11 +64,11 @@ export default class ProductEditor extends Vue implements IProductEditor {
   get organizationTypeRoute(): string {
     return organizationTypeRoutes[this.type];
   }
-  
+
   get typeOfOrganization(): string {
     return organizationTypeTextsByProductType[this.type];
   }
-  
+
   drugTypeText(drugType: EDrugTypes): string {
     return drugTypeTexts[drugType];
   }
@@ -108,82 +108,71 @@ export default class ProductEditor extends Vue implements IProductEditor {
     this.toggleCreateProductDialog();
   }
 
+  @throwsNetworkError()
   async editProduct() {
-    if (this.createProductForm.validate()) {
-      this.creatingProduct = true;
-      const response = await this.productsClient.updateProduct(
-        this.selectedProduct!,
-        this.name,
-        this.description,
-        this.price,
-        this.quantityInStock,
-        this.dosage,
-        this.drugType,
-        this.type
-      );
-      this.creatingProduct = false;
-      if (response.status == 200) {
-        toast({ message: this.productTypeText + " updated" });
-        this.$emit("saved");
-        this.toggleCreateProductDialog();
-        this.selectedProduct = null
-      }
-      else toast({ message: response.errors!.summary });
-    }
+    if (!this.createProductForm.validate()) return;
+    await this.productsClient.updateProduct(
+      this.selectedProduct!,
+      this.name,
+      this.description,
+      this.price,
+      this.quantityInStock,
+      this.dosage,
+      this.drugType,
+      this.type
+    );
+    toast({ icon: "mdi-check", iconColor: "green", message: this.productTypeText + " updated" });
+    this.$emit("saved");
+    this.toggleCreateProductDialog();
   }
 
+  @throwsNetworkError()
   async createProduct() {
-    if (this.createProductForm.validate()) {
-      if (this.account.userType == EUserType.admin) {
-        this.createProductForOrganization();
-        return;
-      }
-      this.creatingProduct = true;
-      const response = await this.productsClient.createProduct(
-        this.name,
-        this.description,
-        this.image!,
-        this.price,
-        this.quantityInStock,
-        this.dosage,
-        this.drugType,
-        this.type,
-      );
-      this.creatingProduct = false;
-      if (response.status == 201 || response.status == 200) {
-        toast({ message: this.productTypeText + " created" });
-        this.$emit("saved");
-        this.toggleCreateProductDialog()
-        this.selectedProduct = null
-      }
-      else toast({ message: response.errors!.summary });
+    if (this.account.userType == EUserType.admin) {
+      this.createProductForOrganization();
+      return;
     }
+    if (!this.createProductForm.validate()) return;
+    await this.productsClient.createProduct(
+      this.name,
+      this.description,
+      this.image!,
+      this.price,
+      this.quantityInStock,
+      this.dosage,
+      this.drugType,
+      this.type,
+    );
+    toast({ icon: "mdi-check", iconColor: "green", message: this.productTypeText + " created" });
+    this.$emit("saved");
+    this.toggleCreateProductDialog();
   }
 
+  @throwsNetworkError()
   async createProductForOrganization(): Promise<void> {
-    if (this.createProductForm.validate()) {
-      this.creatingProduct = true;
-      if(!this.organizationId)
-        this.organizationId = (await this.selectOrganization.getOrganization()).id;
-      const response = await this.productsClient.createProductForOrganization(
-        this.organizationId,
-        this.name,
-        this.description,
-        this.image!,
-        this.price,
-        this.quantityInStock,
-        this.dosage,
-        this.drugType,
-        this.type,
-      );
-      this.creatingProduct = false;
-      if (response.status == 201 || response.status == 200) {
-        toast({ message: this.productTypeText + " created" });
-        this.$emit("saved");
-        this.toggleCreateProductDialog()
-        this.selectedProduct = null
-      }
-      else toast({ message: response.errors!.summary });
-    }
+    if (!this.createProductForm.validate()) return;
+    if (!this.organizationId)
+      this.organizationId = (await this.selectOrganization.getOrganization()).id;
+    await this.productsClient.createProductForOrganization(
+      this.organizationId,
+      this.name,
+      this.description,
+      this.image!,
+      this.price,
+      this.quantityInStock,
+      this.dosage,
+      this.drugType,
+      this.type,
+    );
+    toast({ icon: "mdi-check", iconColor: "green", message: this.productTypeText + " created" });
+    this.$emit("saved");
+    this.toggleCreateProductDialog();
+  }
+
+  @Watch("error.editProduct")
+  @Watch("error.createProduct")
+  @Watch("error.createProductForOrganization")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }

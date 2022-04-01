@@ -32,7 +32,6 @@
                   outlined
                   prepend-inner-icon="mdi-note-text"
                   v-model="description"
-                  type="phone"
                   :rules="[requiredLengthRule(0, 1000)]"
                 />
                 <v-layout>
@@ -82,7 +81,7 @@
                   rounded
                   elevation="0"
                   type="submit"
-                  :loading="creatingProduct"
+                  :loading="loading.editProduct || loading.createProduct || loading.createProductForOrganization"
                 >
                   {{ selectedProduct != null ? "Edit" : "Create" }}
                   {{ productTypeText }}

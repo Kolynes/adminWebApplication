@@ -35,6 +35,7 @@ export interface IAdminOrganizationsClient extends Service {
     email: string,
     description: string,
     address: string,
+    city: string,
     phoneNumber: string,
     profilePhoto: File,
     latitude: number,
@@ -49,13 +50,13 @@ export interface IAdminOrganizationsClient extends Service {
     email: string,
     description: string,
     address: string,
+    city: string,
     phoneNumber: string,
     latitude: number,
     longitude: number,
   ): Promise<IJsonResponse>;
 
   changeProfilePhoto(id: number, profilePhoto: File): Promise<IJsonResponse>;
-
 }
 
 export interface IOrganizationsClient extends Service {

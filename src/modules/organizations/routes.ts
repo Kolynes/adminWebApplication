@@ -1,4 +1,5 @@
 import { RouteConfig } from "vue-router";
+import { EUserType } from "../auth/types";
 import { EProductTypes } from "../products/types";
 import { EOrganizationTypes } from "./types";
 
@@ -11,6 +12,7 @@ export default [
       route.query.type = EOrganizationTypes.pharmacy
       return route.query
     },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/pharmacies/details",
@@ -19,7 +21,8 @@ export default [
     props: route => {
       route.query.type = EOrganizationTypes.pharmacy
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/pharmacies/products",
@@ -28,7 +31,8 @@ export default [
     props: route => {
       route.query.type = EProductTypes.drug
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/oems",
@@ -37,7 +41,8 @@ export default [
     props: route => {
       route.query.type = EOrganizationTypes.OEM
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/oems/details",
@@ -46,7 +51,8 @@ export default [
     props: route => {
       route.query.type = EOrganizationTypes.OEM
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/oems/products",
@@ -55,6 +61,7 @@ export default [
     props: route => {
       route.query.type = EProductTypes.equipment
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
 ] as RouteConfig[];

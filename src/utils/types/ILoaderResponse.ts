@@ -1,4 +1,4 @@
-export default interface ILoaderResponse<T> {
-  items: T[];
+export default interface ILoaderResponse {
+  items: any[];
   hasNextPage: boolean
 }

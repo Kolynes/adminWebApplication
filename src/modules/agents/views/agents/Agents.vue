@@ -2,7 +2,7 @@
   <div>
     <table-view
       title="Delivery Agents"
-      :loading="loading"
+      :loading="loading.getSearchResults"
       :searchString.sync="searchString"
       :items="items"
       :headers="headers"

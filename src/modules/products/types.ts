@@ -1,6 +1,9 @@
 import Service from "@/utils/services/Service";
 import IJsonResponse from "@/utils/types/IJsonResponse";
+import { ICustomer } from "../customers/types";
+import { ITransaction } from "../orders/types";
 import { IOrganization } from "../organizations/types";
+import { IPractitioner } from "../practitioners/types";
 
 export enum EDrugTypes {
   otc = "OTC",
@@ -23,6 +26,27 @@ export interface IProduct {
   dosage: string;
   drugType: EDrugTypes;
   productType: EProductTypes;
+}
+
+export interface IPayment {
+  createdOnDate: string;
+  customer: ICustomer;
+  id: number;
+  isDeleted: boolean;
+  organization: IOrganization;
+  practitioner: IPractitioner;
+  product: IProduct;
+  transaction: ITransaction;
+}
+
+export interface IClick {
+  createdOnDate: Date;
+  customer: ICustomer;
+  id: number;
+  isDeleted: boolean;
+  organization: IOrganization;
+  practitioner: IPractitioner;
+  product: IProduct;
 }
 
 export interface IProductsClient extends Service {

@@ -6,6 +6,7 @@ import OrganizationEditor from "../../components/organization-editor/Organizatio
 import { service } from "@/utils/services/ServiceProvider";
 import { EServices } from "@/types";
 import { icons, organizationTypeTextPlurals, organizationTypeTexts } from "../../constants";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -13,7 +14,7 @@ import { icons, organizationTypeTextPlurals, organizationTypeTexts } from "../..
     OrganizationEditor
   }
 })
-export default class Organizations extends Mixins(TableMixin) implements ITableView<IOrganization> {
+export default class Organizations extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
   @Prop({
     type: String,
     default: EOrganizationTypes.pharmacy
@@ -38,7 +39,6 @@ export default class Organizations extends Mixins(TableMixin) implements ITableV
       value: "phoneNumber"
     }
   ];
-  items = [];
 
   @Ref()
   organizationEditor!: IOrganizationEditor;
@@ -62,40 +62,28 @@ export default class Organizations extends Mixins(TableMixin) implements ITableV
     this.$router.push(`/dashboard/${this.organizationTypeTextPlural.toLowerCase()}/details?id=${organization.id}`);
   }
 
-  deleteOrganization(organization: IOrganization) {
-    confirm({ icon: "mdi-delete", title: `Delete ${this.organizationTypeText}` }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: `Deleting ${this.organizationTypeText.toLowerCase()}...` });
-        const response = await this.organizationsClient.deleteOrganization(organization.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: `${this.organizationTypeText} deleted`});
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deleteOrganization(organization: IOrganization) {
+    const result = await confirm({ icon: "mdi-delete", title: `Delete ${this.organizationTypeText}` });
+    if (!result) return;
+    toast({ loading: true, message: `Deleting ${this.organizationTypeText.toLowerCase()}...` });
+    await this.organizationsClient.deleteOrganization(organization.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: `${this.organizationTypeText} deleted` });
+    this.search();
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IOrganization>> {
+  @throwsNetworkError()
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = await this.organizationsClient.getOrganizations(
       this.type,
-      searchString, 
-      page, 
+      searchString,
+      page,
       pageSize
     );
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
-    }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
   }
 
@@ -103,5 +91,11 @@ export default class Organizations extends Mixins(TableMixin) implements ITableV
   onTypeChange() {
     this.items = [];
     this.search();
+  }
+
+  @Watch("error.deleteOrganization")
+  @Watch("error.getSearchResults")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }

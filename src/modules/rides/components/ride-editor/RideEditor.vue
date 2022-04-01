@@ -54,7 +54,7 @@
               rounded
               elevation="0"
               type="submit"
-              :loading="creatingRide"
+              :loading="loading.createRide || loading.editRide"
             >
               {{ selectedRide != null ? "Edit" : "Create" }}
               Ride

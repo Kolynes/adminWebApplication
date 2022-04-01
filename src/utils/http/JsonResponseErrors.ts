@@ -1,4 +1,4 @@
-import IIndexableObject from "../types/IIndexableObject";
+import IIndexableObject from "../types/IIndexable";
 
 export default class JsonResponseErrors {
   constructor(

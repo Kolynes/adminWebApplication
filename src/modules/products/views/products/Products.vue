@@ -2,7 +2,7 @@
   <div>
     <table-view
       :title="typeTextPlural"
-      :loading="loading"
+      :loading="loading.getSearchResults"
       :searchString.sync="searchString"
       :items="items"
       :headers="headers"

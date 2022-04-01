@@ -24,11 +24,10 @@ export default class JsonResponse implements IJsonResponse {
     }
   
     private constructor(response?: Response) {
-      if(response)
-        this.baseResponse = response;
+      if(response) this.baseResponse = response;
     }
   
-    static async createJsonResponse<T>(baseResponse?: Response, errors?: IJsonResponseErrors): Promise<JsonResponse> {
+    static async createJsonResponse(baseResponse?: Response, errors?: IJsonResponseErrors): Promise<JsonResponse> {
       if(baseResponse != null) {
         let response = new JsonResponse(baseResponse);
         try {
@@ -38,14 +37,13 @@ export default class JsonResponse implements IJsonResponse {
           response.nextPage = json.nextPage;
           response.previousPage = json.previousPage;
           response.errors = json.errors;
-
         } finally {
           return response;
         }
       }
       else {
         const response = new JsonResponse();
-        response.errors = errors;
+        response.errors = errors || { summary: "", fields: []};
         return response;
       }
     }

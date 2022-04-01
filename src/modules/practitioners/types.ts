@@ -139,6 +139,18 @@ export interface IAdminPractitionersClient extends Service {
 
   changeProfilePhoto(id: number, profilePhoto: File): Promise<IJsonResponse>;
 
+  getClicks(
+    query: string, 
+    page?: number,
+    pageSize?: number,
+  ): Promise<IJsonResponse>;
+
+  getClicksByPractitioner(
+    id: number,
+    page?: number,
+    pageSize?: number,
+  ): Promise<IJsonResponse>;
+
 }
 
 export interface IPractitonersClient extends Service {

@@ -2,7 +2,7 @@
   <v-skeleton-loader
     type="list-item-avatar, article@3, heading, list-item-avatar-three-line@3 "
     style="width: 600px"
-    v-if="loading"
+    v-if="loading.getPractitioner"
   />
   <v-container grid-list-xl v-else>
     <v-row class="mb-3 mx-1" align="center">

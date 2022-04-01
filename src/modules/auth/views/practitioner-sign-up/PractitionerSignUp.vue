@@ -24,7 +24,7 @@
                 outlined
                 v-model="name"
                 :rules="[requiredRule]"
-                :error-messages="errors.name"
+                :error-messages="errorFields.name"
               />
               <v-text-field
                 label="Email"
@@ -33,7 +33,7 @@
                 v-model="email"
                 type="email"
                 :rules="[emailRule]"
-                :error-messages="errors.email"
+                :error-messages="errorFields.email"
               />
               <v-textarea
                 label="Description"
@@ -42,7 +42,7 @@
                 v-model="description"
                 type="phone"
                 :rules="[requiredRule]"
-                :error-messages="errors.description"
+                :error-messages="errorFields.description"
               />
               <v-layout v-if="!selectedPractitioner">
                 <v-flex xs4>
@@ -71,14 +71,14 @@
                     outlined
                     v-model="identificationPhoto"
                     :rules="[requiredRule]"
-                    :error-messages="errors.identificationPhoto"
+                    :error-messages="errorFields.identificationPhoto"
                   />
                   <v-file-field
                     label="Verification Photo"
                     outlined
                     v-model="verificationPhoto"
                     :rules="[requiredRule]"
-                    :error-messages="errors.verificationPhoto"
+                    :error-messages="errorFields.verificationPhoto"
                   />
                 </v-flex>
               </v-layout>
@@ -89,7 +89,7 @@
                 v-model="phoneNumber"
                 type="phone"
                 :rules="[requiredLengthRule(10)]"
-                :error-messages="errors.phoneNumber"
+                :error-messages="errorFields.phoneNumber"
               />
               <v-file-field
                 label="Profile Photo"
@@ -97,7 +97,7 @@
                 v-model="profilePhoto"
                 :rules="[requiredRule]"
                 v-if="!selectedPractitioner"
-                :error-messages="errors.profilePhoto"
+                :error-messages="errorFields.profilePhoto"
               />
               <v-password-field
                 label="Password"
@@ -128,7 +128,7 @@
                     v-model="specialties"
                     type="phone"
                     :rules="[requiredRule]"
-                    :error-messages="errors.specialties"
+                    :error-messages="errorFields.specialties"
                   />
                 </v-flex>
                 <v-flex>
@@ -139,7 +139,7 @@
                     v-model="yearsOfExperience"
                     type="number"
                     :rules="[requiredRule]"
-                    :error-messages="errors.yearsOfExperience"
+                    :error-messages="errorFields.yearsOfExperience"
                   />
                   <v-text-field
                     label="Company Name"
@@ -147,7 +147,7 @@
                     prepend-inner-icon="mdi-city"
                     v-model="companyName"
                     :rules="[requiredRule]"
-                    :error-messages="errors.companyName"
+                    :error-messages="errorFields.companyName"
                   />
                 </v-flex>
               </v-layout>
@@ -192,7 +192,7 @@
                     rounded
                     elevation="0"
                     type="submit"
-                    :loading="creatingPractitioner"
+                    :loading="loading.createPractitioner"
                   >
                     {{ selectedPractitioner != null ? "Edit" : "Create" }}
                     Practitioner

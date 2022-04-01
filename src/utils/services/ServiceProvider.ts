@@ -1,4 +1,4 @@
-import IIndexableObject from "../types/IIndexableObject";
+import IIndexableObject from "../types/IIndexable";
 import Service from "./Service";
 
 export function service(serviceKey: any): PropertyDecorator {

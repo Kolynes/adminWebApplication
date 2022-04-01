@@ -3,12 +3,13 @@ import { EServices } from "@/types";
 import { emailRule, requiredLengthRule, requiredRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
 import IVForm from "@/utils/types/IVForm";
-import { Component, Mixins, Ref } from "vue-property-decorator";
+import { Component, Mixins, Ref, Watch } from "vue-property-decorator";
 import { identicationTypes, typeTexts, verificationTypes } from "@/modules/practitioners/constants";
 import { EIdentificationTypes, EPractitionerTypes, EVerificationTypes, IAdminPractitionersClient, IPractitioner, IPractitionerEditor, IPractitonersClient } from "@/modules/practitioners/types";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";
 import VFileField from "@/vuetify-extensions/VFileField.vue";
 import { IAdminSettingsClient } from "@/modules/admins/types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -16,7 +17,7 @@ import { IAdminSettingsClient } from "@/modules/admins/types";
     VFileField
   }
 })
-export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) {
+export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin, NetworkManagerMixin) {
   name = "";
   yearsOfExperience = 0;
   phoneNumber = "";
@@ -32,10 +33,7 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) {
   password = "";
   practitionerType: EPractitionerTypes | null = null;
   dialogVisible = false;
-  errors = {};
-  creatingPractitioner = false;
   cities = [];
-  loadingCities = false;
   city = "";
 
   @Ref()
@@ -72,10 +70,10 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) {
   requiredLengthRule = requiredLengthRule;
   requiredRule = requiredRule;
 
+  @throwsNetworkError()
   async createPractitioner() {
     if(!this.practitionerEditorForm.validate()) return;
-    this.creatingPractitioner = true;
-    const response = await this.practitionersClient.signUp(
+    await this.practitionersClient.signUp(
       this.name,
       this.email,
       this.phoneNumber,
@@ -95,25 +93,21 @@ export default class PractitionerEditor extends Mixins(GooglePlacesAPIMixin) {
       this.profilePhoto!,
       this.password
     );
-    this.creatingPractitioner = false;
-    if(response.status == 200 || response.status == 201) {
-      console.log(response)
-      toast({ message: "Practitioner created"});
-    } else {
-      toast({ message: response.errors!.summary });
-      this.errors = response.errors!.fields;
-    }
+    // go to practitionr dashboard from here
   }
 
+  @throwsNetworkError()
   async getCities() {
-    this.loadingCities = true;
     const response = await this.adminSettingsClient.getCities();
-    this.loadingCities = false;
-    if(response.status == 200)
-      this.cities = response.data;
-    else toast({ message: "Failed to get cities" });
+    this.cities = response.data.map((city: string) => city.toUpperCase());
   }
 
+  @Watch("error.createPractitioner")
+  @Watch("error.getCities")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
+  }
+  
   mounted() {
     this.getCities();
     this.initiateMap();

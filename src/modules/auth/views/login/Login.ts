@@ -1,5 +1,5 @@
 import IVForm from "@/utils/types/IVForm";
-import { Vue, Component, Ref } from "vue-property-decorator";
+import { Component, Ref, Mixins } from "vue-property-decorator";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";
 import { service } from "@/utils/services/ServiceProvider";
 import { emailRule, requiredRule } from "@/utils/rules";
@@ -8,16 +8,16 @@ import { EUserType, IAccount, IAuthClient } from "../../types";
 import { IAdminUsersClient } from "@/modules/admins/types";
 import { IPractitonersClient } from "@/modules/practitioners/types";
 import { IOrganizationsClient } from "@/modules/organizations/types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
     VPasswordField
   }
 })
-export default class Login extends Vue {
+export default class Login extends Mixins(NetworkManagerMixin) {
   email = "";
   password = "";
-  signingIn = false;
 
   @service(EServices.auth)
   auth!: IAuthClient;
@@ -37,31 +37,27 @@ export default class Login extends Vue {
   requiredRule = requiredRule;
   emailRule = emailRule;
 
+  @throwsNetworkError()
   async login() {
     if (!this.loginForm.validate()) return;
-    this.signingIn = true;
     const response = await this.auth.login(
       this.email,
       this.password
     );
-    this.signingIn = false;
-    if (response.status == 200) {
-      const account = response.data as IAccount;
-      switch(account.userType) {
-        case EUserType.admin:
-          await this.adminsClient.getCurrent();
-          break;
-        case EUserType.organization:
-          await this.organizationsClient.getCurrent();
-          break;
-        case EUserType.practitioner:
-          await this.practitionersClient.getCurrent();
-          break;
-        default: 
-          toast({ message: "unknown user"})
-      }
-      this.$router.replace("/dashboard");
+    const account = response.data as IAccount;
+    switch(account.userType) {
+      case EUserType.admin:
+        await this.adminsClient.getCurrent();
+        break;
+      case EUserType.organization:
+        await this.organizationsClient.getCurrent();
+        break;
+      case EUserType.practitioner:
+        await this.practitionersClient.getCurrent();
+        break;
+      default: 
+        toast({ message: "unknown user"})
     }
-    else toast({ message: response.errors!.summary })
+    this.$router.replace("/dashboard");
   }
 }

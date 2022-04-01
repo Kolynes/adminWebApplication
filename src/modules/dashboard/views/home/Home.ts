@@ -1,4 +1,4 @@
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Mixins } from "vue-property-decorator";
 import OrdersOverview from "@/components/orders-overview/OrdersOverview";
 import Sales from "@/components/sales/Sales"
 import CustomerStatistics from "@/components/customer-statistics/CustomerStatistics"
@@ -7,6 +7,7 @@ import { EServices } from "@/types";
 import { IAuthClient } from "@/modules/auth/types";
 import { IAdminDashboardClient, IAdminDashboardInfo } from "../../types";
 import { EOrderTypes, IOrder } from "@/modules/orders/types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -15,8 +16,7 @@ import { EOrderTypes, IOrder } from "@/modules/orders/types";
     CustomerStatistics
   }
 })
-export default class Home extends Vue {
-  loading = false;
+export default class Home extends Mixins(NetworkManagerMixin) {
   dashboardDetails: IAdminDashboardInfo | null = null;
   orderTypes = [
     {
@@ -93,13 +93,11 @@ export default class Home extends Vue {
     const createdOn = new Date(order.createdOnDate);
     return `${createdOn.toDateString().slice(4, 7)} ${createdOn.getFullYear()} `;
   }
-
+  
+  @throwsNetworkError()
   async getDashboardDetails() {
     const response = await this.adminDashboardClient.getDashboard();
-    this.loading = false;
-    if(response.status == 200)
-      this.dashboardDetails = response.data;
-    else toast({ message: response.errors!.summary });
+    this.dashboardDetails = response.data;
   }
 
   async logout() {

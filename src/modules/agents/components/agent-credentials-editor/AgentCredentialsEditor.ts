@@ -2,23 +2,21 @@ import { EServices } from "@/types";
 import { emailRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
 import IVForm from "@/utils/types/IVForm";
-import { Component, Ref, Vue } from "vue-property-decorator";
+import { Component, Mixins, Ref, Watch } from "vue-property-decorator";
 import { IAdminAgentsClient, IAgent } from "../../types";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
     VPasswordField
   }
 })
-export default class AgentCredentialsEditor extends Vue {
+export default class AgentCredentialsEditor extends Mixins(NetworkManagerMixin) {
   password = "";
   email = "";
   selectedAgent: number | null = null;
   dialogVisible = false;
-  updating = false;
-  emailErrors = [];
-  passwordErrors = [];
 
   @Ref()
   agentCredentialsForm!: IVForm;
@@ -30,6 +28,10 @@ export default class AgentCredentialsEditor extends Vue {
 
   toggleDialog() {
     this.dialogVisible = !this.dialogVisible;
+    if(!this.dialogVisible) {
+      this.selectedAgent = null;
+      this.agentCredentialsForm.reset();
+    }
   }
 
   beginEditAgent(agent: IAgent) {
@@ -38,21 +40,17 @@ export default class AgentCredentialsEditor extends Vue {
     this.toggleDialog();
   }
 
+  @throwsNetworkError()
   async updateAgentCredentials() {
     if(!this.agentCredentialsForm.validate()) return;
-    this.updating = true;
-    const response = await this.agentsClient.updateAgentCredentials(this.selectedAgent!, this.email, this.password);
-    this.updating = false;
-    if(response.status == 200) {
-      toast({ message: "Agent credentials updated"});
-      this.$emit("saved");
-      this.toggleDialog();
-      this.selectedAgent = null;
-    }
-    else {
-      toast({ message: response.errors!.summary });
-      this.emailErrors = response.errors!.fields.email;
-      this.passwordErrors = response.errors!.fields.password;
-    }
+    await this.agentsClient.updateAgentCredentials(this.selectedAgent!, this.email, this.password);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Agent credentials updated"});
+    this.$emit("saved");
+    this.toggleDialog();
+  }
+
+  @Watch("error.updateAgentCredentials")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }

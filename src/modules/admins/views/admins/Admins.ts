@@ -1,4 +1,4 @@
-import { Component, Mixins, Ref } from "vue-property-decorator"
+import { Component, Mixins, Ref, Watch } from "vue-property-decorator"
 import TableMixin, { ISearchResults, ITableView } from "@/mixins/TableMixin";
 import TableView from "@/components/TableView.vue";
 import { IUser } from "@/modules/auth/types";
@@ -6,6 +6,7 @@ import AdminEditor from "../../components/admin-editor/AdminEditor";
 import { service } from "@/utils/services/ServiceProvider";
 import { EServices } from "@/types";
 import { IAdminEditor, IAdminUsersClient } from "../../types";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -13,7 +14,7 @@ import { IAdminEditor, IAdminUsersClient } from "../../types";
     AdminEditor
   }
 })
-export default class Admins extends Mixins(TableMixin) implements ITableView<IUser> {
+export default class Admins extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
 
   headers = [
     {
@@ -37,7 +38,6 @@ export default class Admins extends Mixins(TableMixin) implements ITableView<IUs
       value: "active"
     }
   ];
-  items = [];
 
   @Ref()
   adminEditor!: IAdminEditor;
@@ -49,70 +49,57 @@ export default class Admins extends Mixins(TableMixin) implements ITableView<IUs
     this.$router.push(`/dashboard/admins/details?id=${admin.id}`)
   }
 
-  deleteAdmin(admin: IUser) {
-    confirm({ icon: "mdi-delete", title: "Delete admin" }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: "Deleting admin..." });
-        const response = await this.usersClient.deleteUser(admin.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: "Admin deleted"});
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deleteAdmin(admin: IUser) {
+    const result = await confirm({ icon: "mdi-delete", title: "Delete admin" })
+    if (!result) return;
+    toast({ loading: true, message: "Deleting admin..." });
+    await this.usersClient.deleteUser(admin.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Admin deleted" });
+    this.search();
   }
 
-  enableAdmin(admin: IUser) {
-    confirm({ icon: "mdi-check", title: "Enable admin" }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: "Enabling admin..." });
-        const response = await this.usersClient.enableUser(admin.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: "Admin enabled"});
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async enableAdmin(admin: IUser) {
+    const result = await confirm({ icon: "mdi-check", title: "Enable admin" });
+    if (!result) return;
+    toast({ loading: true, message: "Enabling admin..." });
+    await this.usersClient.enableUser(admin.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Admin enabled" });
+    this.search();
   }
 
-  disableAdmin(admin: IUser) {
-    confirm({ icon: "mdi-close", title: "Disable admin" }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: "Disabling admin..." });
-        const response = await this.usersClient.disableUser(admin.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: "Admin disabled"});
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async disableAdmin(admin: IUser) {
+    const result = await confirm({ icon: "mdi-close", title: "Disable admin" });
+    if (!result) return;
+    toast({ loading: true, message: "Disabling admin..." });
+    await this.usersClient.disableUser(admin.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Admin disabled" });
+    this.search();
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IUser>> {
+  @throwsNetworkError()
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = await this.usersClient.getUsers(
-      searchString, 
-      page, 
+      searchString,
+      page,
       pageSize
     );
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
-    }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
   }
 
+  @Watch("error.deleteAdmin")
+  @Watch("error.enableAdmin")
+  @Watch("error.disableAdmin")
+  @Watch("error.getSearchResults")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
+  }
 }

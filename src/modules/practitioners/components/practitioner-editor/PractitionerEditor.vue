@@ -11,11 +11,12 @@
       </v-card-title>
       <v-card-text>
         <v-container grid-list-xl>
-          <v-form ref="practitionerEditorForm" @submit.prevent="
-            selectedPractitioner
-              ? updatePractitoner()
-              : createPractitioner()
-          ">
+          <v-form
+            ref="practitionerEditorForm"
+            @submit.prevent="
+              selectedPractitioner ? updatePractitioner() : createPractitioner()
+            "
+          >
             <v-layout>
               <v-flex xs6>
                 <v-text-field
@@ -23,7 +24,7 @@
                   outlined
                   v-model="name"
                   :rules="[requiredRule]"
-                  :error-messages="errors.name"
+                  :error-messages="errorFields.name"
                 />
                 <v-text-field
                   label="Email"
@@ -32,7 +33,7 @@
                   v-model="email"
                   type="email"
                   :rules="[emailRule]"
-                  :error-messages="errors.email"
+                  :error-messages="errorFields.email"
                 />
                 <v-textarea
                   label="Description"
@@ -41,7 +42,7 @@
                   v-model="description"
                   type="phone"
                   :rules="[requiredRule]"
-                  :error-messages="errors.description"
+                  :error-messages="errorFields.description"
                 />
                 <v-layout v-if="!selectedPractitioner">
                   <v-flex xs4>
@@ -70,14 +71,14 @@
                       outlined
                       v-model="identificationPhoto"
                       :rules="[requiredRule]"
-                      :error-messages="errors.identificationPhoto"
+                      :error-messages="errorFields.identificationPhoto"
                     />
                     <v-file-field
                       label="Verification Photo"
                       outlined
                       v-model="verificationPhoto"
                       :rules="[requiredRule]"
-                      :error-messages="errors.verificationPhoto"
+                      :error-messages="errorFields.verificationPhoto"
                     />
                   </v-flex>
                 </v-layout>
@@ -88,7 +89,7 @@
                   v-model="phoneNumber"
                   type="phone"
                   :rules="[requiredLengthRule(10)]"
-                  :error-messages="errors.phoneNumber"
+                  :error-messages="errorFields.phoneNumber"
                 />
                 <v-file-field
                   label="Profile Photo"
@@ -96,7 +97,7 @@
                   v-model="profilePhoto"
                   :rules="[requiredRule]"
                   v-if="!selectedPractitioner"
-                  :error-messages="errors.profilePhoto"
+                  :error-messages="errorFields.profilePhoto"
                 />
                 <v-password-field
                   label="Password"
@@ -106,6 +107,19 @@
                   :rules="[requiredLengthRule(6)]"
                   v-if="!selectedPractitioner"
                 />
+                <v-btn
+                  class="text-capitalize font-weight-bold"
+                  color="primary"
+                  rounded
+                  elevation="0"
+                  type="submit"
+                  :loading="
+                    loading.createPractitioner || loading.updatePractitioner
+                  "
+                >
+                  {{ selectedPractitioner != null ? "Edit" : "Create" }}
+                  {{ typeText }}
+                </v-btn>
               </v-flex>
               <v-flex xs6>
                 <v-layout>
@@ -117,7 +131,7 @@
                       v-model="specialties"
                       type="phone"
                       :rules="[requiredRule]"
-                      :error-messages="errors.specialties"
+                      :error-messages="errorFields.specialties"
                     />
                   </v-flex>
                   <v-flex>
@@ -128,7 +142,7 @@
                       v-model="yearsOfExperience"
                       type="number"
                       :rules="[requiredRule]"
-                      :error-messages="errors.yearsOfExperience"
+                      :error-messages="errorFields.yearsOfExperience"
                     />
                     <v-text-field
                       label="Company Name"
@@ -136,7 +150,7 @@
                       prepend-inner-icon="mdi-city"
                       v-model="companyName"
                       :rules="[requiredRule]"
-                      :error-messages="errors.companyName"
+                      :error-messages="errorFields.companyName"
                     />
                   </v-flex>
                 </v-layout>
@@ -169,24 +183,13 @@
                   :items="cities"
                   v-model="city"
                   :rules="[requiredRule]"
-                  :loading="loadingCities"
+                  :loading="loading.getCities"
                   @focus="getCities"
                   outlined
                 />
                 <div ref="mapElement" style="height: 400px"></div>
               </v-flex>
             </v-layout>
-            <v-btn
-              class="text-capitalize font-weight-bold"
-              color="primary"
-              rounded
-              elevation="0"
-              type="submit"
-              :loading="creatingPractitioner"
-            >
-              {{ selectedPractitioner != null ? "Edit" : "Create" }}
-              {{ typeText }}
-            </v-btn>
           </v-form>
         </v-container>
       </v-card-text>

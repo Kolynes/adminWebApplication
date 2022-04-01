@@ -23,12 +23,14 @@
               label="First Name"
               outlined
               v-model="firstName"
+              :error-message="errorFields.firstName"
               :rules="[requiredLengthRule(2)]"
             />
             <v-text-field
               label="Last Name"
               outlined
               v-model="lastName"
+              :error-message="errorFields.lastName"
               :rules="[requiredLengthRule(2)]"
             />
             <v-text-field
@@ -36,6 +38,7 @@
               outlined
               prepend-inner-icon="mdi-email"
               v-model="email"
+              :error-message="errorFields.email"
               :rules="[requiredRule]"
             />
             <v-text-field
@@ -43,6 +46,7 @@
               outlined
               prepend-inner-icon="mdi-city"
               v-model="city"
+              :error-message="errorFields.city"
               :rules="[requiredRule]"
             />
             <v-text-field
@@ -50,6 +54,7 @@
               outlined
               prepend-inner-icon="mdi-phone"
               v-model="phoneNumber"
+              :error-message="errorFields.phoneNumber"
               :rules="[requiredRule]"
             />
             <v-password-field
@@ -65,12 +70,14 @@
               prepend-inner-icon="mdi-check"
               v-else
               v-model="availability"
+              :error-message="errorFields.availability"
             />
             <v-file-field
               v-if="!selectedAgent"
               label="Profile Picture"
               outlined
               v-model="profilePhoto"
+              :error-message="errorFields.profilePhoto"
               :rules="[requiredRule]"
             />
             <v-btn
@@ -79,7 +86,7 @@
               rounded
               elevation="0"
               type="submit"
-              :loading="creatingAgent"
+              :loading="loading.editAgent || loading.createAgent"
             >
               {{ selectedAgent != null ? "Edit" : "Create" }}
               Agent

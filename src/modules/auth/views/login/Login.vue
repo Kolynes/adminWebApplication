@@ -26,7 +26,7 @@
             <v-btn
               block
               color="primary"
-              :loading="signingIn"
+              :loading="loading.login"
               type="submit"
               class="font-weight-bold text-capitalize mt-3"
               elevation="0"

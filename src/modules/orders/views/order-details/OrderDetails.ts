@@ -1,6 +1,6 @@
 import SelectAgent from "@/modules/agents/components/select-agent/SelectAgent.vue";
 import { service } from "@/utils/services/ServiceProvider";
-import { Vue, Component, Prop, Ref } from "vue-property-decorator";
+import { Component, Prop, Ref, Mixins, Watch } from "vue-property-decorator";
 import { IProduct } from "@/modules/products/types";
 import { EServices } from "@/types";
 import { EOrderTypes, IAdminOrdersClient, IOrder } from "../../types";
@@ -9,19 +9,21 @@ import { IAdminAgentsClient, IAgent, ISelectAgent } from "@/modules/agents/types
 import { IAdminCustomersClient } from "@/modules/customers/types";
 import { typeTextPlurals } from "../../contants";
 import { datetime } from "@/utils/time";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
+import IIndexable from "@/utils/types/IIndexable";
 
 @Component({
   components: {
     SelectAgent
   }
 })
-export default class OrderDetails extends Vue {
+export default class OrderDetails extends Mixins(NetworkManagerMixin) {
   @Prop()
-  id!:number;
+  id!: number;
 
   @Ref()
   selectAgent!: ISelectAgent;
-  
+
   @service(EServices.adminOrders)
   ordersClient!: IAdminOrdersClient;
 
@@ -53,8 +55,10 @@ export default class OrderDetails extends Vue {
       className: "green green--text lighten-5",
     },
   ];
-  loading = true;
-  deleting = false;
+
+  loading: IIndexable<boolean> = {
+    getOrder: true
+  };
   order: IOrder | null = null;
 
   get customer(): IUser | null {
@@ -81,56 +85,44 @@ export default class OrderDetails extends Vue {
 
   async getOrder() {
     const response = await this.ordersClient.getOrder(this.id);
-    this.loading = false;
-    if(response.status == 200) 
-      this.order = response.data;
-    else toast({ message: response.errors!.summary });
+    this.order = response.data;
   }
 
-  deleteOrder() {
-    confirm({ title: "Delete Order", icon: "mdi-delete"}).then(async (result: boolean) => {
-      if(result) {
-        this.deleting = true;
-        const response = await this.ordersClient.deleteOrder(this.order!.id);
-        this.deleting = false;
-        if(response.status == 200) {
-          toast({ message: "Order deleted" });
-          this.$router.back();
-        }
-        else toast({ message: response.errors!.summary});
-      }
-    });
+  @throwsNetworkError()
+  async deleteOrder() {
+    const result = await confirm({ title: "Delete Order", icon: "mdi-delete" })
+    if (!result) return;
+    await this.ordersClient.deleteOrder(this.order!.id);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Order deleted" });
+    this.$router.back();
   }
 
+  @throwsNetworkError()
   async assignAgent() {
     const agent: IAgent | null = await this.selectAgent.getAgent();
-    if(agent == null)
-      return;
-    if(this.agent != null) {
+    if (agent == null) return;
+    if (this.agent != null) {
       const confirmation = await confirm({
         icon: "mdi-motormike",
         title: "Assign Delivery Agent",
         message: "This order has already been assigned to another agent. Do you wish to reassign?"
-      })
-      if(!confirmation)
-        return;
+      });
+      if (!confirmation) return;
       toast({ loading: true, message: "Unassigning agent" })
-      const response = await this.ordersClient.unassignOrderToAgent(this.order!.id, this.agent!.id);
-      if(response.status == 200)
-        toast({ loading: true, message: `Order has been unassigned. Reassigning order...`});
-      else {
-        toast({ message: response.errors!.summary });
-        return;
-      }
+      await this.ordersClient.unassignOrderToAgent(this.order!.id, this.agent!.id);
+      toast({ loading: true, message: `Order has been unassigned. Reassigning order...` });
     }
     toast({ loading: true, message: "Assigning agent" })
-    const response = await this.ordersClient.assignOrderToAgent(this.order!.id, agent.id);
+    await this.ordersClient.assignOrderToAgent(this.order!.id, agent.id);
     toast(false);
-    if(response.status == 200) {
-      toast({ message: `Order has been assigned to ${agent.firstName} ${agent.lastName}`});
-      this.getOrder();
-    }
-    else toast({ message: response.errors!.summary })
+    toast({ icon: "mdi-check", iconColor: "green", message: `Order has been assigned to ${agent.firstName} ${agent.lastName}` });
+    this.getOrder();
+  }
+
+  @Watch("error.deleteOrder")
+  @Watch("error.assignAgent")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 
   mounted() {

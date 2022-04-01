@@ -3,10 +3,11 @@ import TableView from "@/components/TableView.vue";
 import TableMixin, { ISearchResults, ITableView } from "@/mixins/TableMixin";
 import { service } from "@/utils/services/ServiceProvider";
 import { EProductTypes, IProduct, IProductEditor, IProductsClient } from "@/modules/products/types";
-import { IAdminOrganizationsClient, IOrganization } from "../../types";
+import { EOrganizationTypes, IAdminOrganizationsClient, IOrganization } from "../../types";
 import { EServices } from "@/types";
 import ProductEditor from "@/modules/products/components/product-editor/ProductEditor";
 import { productTypeTextPlurals, productTypeTexts } from "@/modules/products/constants";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -14,7 +15,7 @@ import { productTypeTextPlurals, productTypeTexts } from "@/modules/products/con
     ProductEditor
   }
 })
-export default class OrganizationProducts extends Mixins(TableMixin) implements ITableView<IProduct> {
+export default class OrganizationProducts extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
   @Prop({
     type: Number,
     required: true
@@ -42,9 +43,8 @@ export default class OrganizationProducts extends Mixins(TableMixin) implements 
       value: "quantityInStock"
     },
   ];
-  items = [];
+  
   type = EProductTypes.drug;
-
   organization: IOrganization | null = null;
 
   @service(EServices.products)
@@ -71,7 +71,8 @@ export default class OrganizationProducts extends Mixins(TableMixin) implements 
     this.$router.push(`/dashboard/${this.typeTextPlural.toLowerCase()}/details?id=${product.id}`);
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IProduct>> {
+  @throwsNetworkError()
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = await this.productsClient.getProductsByOrganization(
       this.organizationId,
       this.type,
@@ -79,31 +80,31 @@ export default class OrganizationProducts extends Mixins(TableMixin) implements 
       page, 
       pageSize
     );
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
-    }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
   }
 
+  @throwsNetworkError()
   async getOrganization() {
     const response = await this.organizatonsClient.getOrganization(this.organizationId);
-    if(response.status == 200)
-      this.organization = response.data;
+    this.organization = response.data;
+    this.organization!.organizationType == EOrganizationTypes.OEM
+      ? this.type == EProductTypes.equipment
+      : this.type == EProductTypes.drug;
   }
 
   @Watch("type")
   async onTypeChange() {
     this.items = [];
     await this.search();
+  }
+
+  @Watch("error.getSearchResults")
+  @Watch("error.getOrganization")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 
   mounted() {

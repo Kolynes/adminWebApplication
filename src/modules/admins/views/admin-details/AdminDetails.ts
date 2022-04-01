@@ -1,17 +1,19 @@
 import { IAdminEditor, IAdminUsersClient } from "../../types";
 import { service } from "@/utils/services/ServiceProvider";
-import { Component, Prop, Ref, Vue } from "vue-property-decorator";
+import { Component, Mixins, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 import { ERoleTypes, IUser } from "@/modules/auth/types";
 import { EServices } from "@/types";
 import AdminEditor from "../../components/admin-editor/AdminEditor";
 import { roleTexts } from "../../constants";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
+import IIndexable from "@/utils/types/IIndexable";
 
 @Component({
   components: {
     AdminEditor
   }
 })
-export default class AdminDetails extends Vue {
+export default class AdminDetails extends Mixins(NetworkManagerMixin) {
   @Prop({
     type: Number,
     required: true
@@ -23,68 +25,64 @@ export default class AdminDetails extends Vue {
 
   @service(EServices.adminUsers)
   usersClient!: IAdminUsersClient;
-  
+
   admin: IUser | null = null;
-  loading = true;
+  loading: IIndexable<boolean> = {
+    getAdmin: true
+  }
 
   getRoleText(role: ERoleTypes) {
     return roleTexts[role];
   }
 
+  @throwsNetworkError()
   async getAdmin() {
     const response = await this.usersClient.getUser(this.id);
-    this.loading = false;
-    if(response.status == 200)
-      this.admin = response.data;
-    else toast({ message: "User not found"});
+    this.admin = response.data;
   }
 
-  deleteAdmin(admin: IUser) {
-    confirm({ icon: "mdi-delete", title: "Delete admin" }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: "Deleting admin..." });
-        const response = await this.usersClient.deleteUser(admin.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: "Admin deleted"});
-          this.$router.back();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deleteAdmin(admin: IUser) {
+    const result = await confirm({ icon: "mdi-delete", title: "Delete admin" });
+    if (!result) return;
+    toast({ loading: true, message: "Deleting admin..." });
+    await this.usersClient.deleteUser(admin.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Admin deleted" });
+    this.$router.back();
   }
 
-  enableAdmin(admin: IUser) {
-    confirm({ icon: "mdi-check", title: "Enable admin" }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: "Enabling admin..." });
-        const response = await this.usersClient.enableUser(admin.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: "Admin enabled"});
-          this.getAdmin();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async enableAdmin(admin: IUser) {
+    const result = await confirm({ icon: "mdi-check", title: "Enable admin" });
+    if (!result) return;
+    toast({ loading: true, message: "Enabling admin..." });
+    await this.usersClient.enableUser(admin.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Admin enabled" });
+    this.getAdmin();
   }
 
-  disableAdmin(admin: IUser) {
-    confirm({ icon: "mdi-close", title: "Disable admin" }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: "Disabling admin..." });
-        const response = await this.usersClient.disableUser(admin.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: "Admin disabled"});
-          this.getAdmin();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async disableAdmin(admin: IUser) {
+    const result = await confirm({ icon: "mdi-close", title: "Disable admin" });
+    if (!result) return
+    toast({ loading: true, message: "Disabling admin..." });
+    await this.usersClient.disableUser(admin.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: "Admin disabled" });
+    this.getAdmin();
   }
 
-  mounted() { 
+  @Watch("error.getAdmin")
+  @Watch("error.deleteAdmin")
+  @Watch("error.enableAdmin")
+  @Watch("error.disableAdmin")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
+  }
+
+  mounted() {
     this.getAdmin()
   }
 }

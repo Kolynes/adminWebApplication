@@ -2,7 +2,7 @@
   <div>
     <table-view
       title="Trips"
-      :loading="loading"
+      :loading="loading.getSearchResults"
       :searchString.sync="searchString"
       :items="items"
       :headers="headers"

@@ -27,6 +27,7 @@
                       label="First Name"
                       outlined
                       v-model="firstName"
+                      :error-messages="errorFields.firstName"
                       :rules="[requiredLengthRule(2)]"
                     />
                   </v-flex>
@@ -35,6 +36,7 @@
                       label="Last Name"
                       outlined
                       v-model="lastName"
+                      :error-messages="errorFields.lastName"
                       :rules="[requiredLengthRule(2)]"
                     />
                   </v-flex>
@@ -44,6 +46,7 @@
                   outlined
                   prepend-inner-icon="mdi-email"
                   v-model="email"
+                  :error-messages="errorFields.email"
                   type="email"
                   v-if="!selectedCustomer"
                   :rules="[emailRule]"
@@ -53,6 +56,7 @@
                   outlined
                   prepend-inner-icon="mdi-phone"
                   v-model="phoneNumber"
+                  :error-messages="errorFields.phoneNumber"
                   type="phone"
                   :rules="[requiredLengthRule(10)]"
                 />
@@ -61,6 +65,7 @@
                   outlined
                   prepend-inner-icon="mdi-map-marker"
                   v-model="address"
+                  :error-messages="errorFields.address"
                   v-if="!selectedCustomer"
                   type="address"
                   :rules="[requiredLengthRule(2)]"
@@ -72,6 +77,7 @@
                   outlined
                   prepend-inner-icon="mdi-city"
                   v-model="city"
+                  :error-messages="errorFields.city"
                   type="city"
                 />
                 <v-text-field
@@ -79,6 +85,7 @@
                   outlined
                   prepend-inner-icon="mdi-map"
                   v-model="state"
+                  :error-messages="errorFields.state"
                   type="address"
                 />
                 <v-layout>
@@ -88,6 +95,7 @@
                       outlined
                       prepend-inner-icon="mdi-gender-male-female"
                       v-model="gender"
+                      :error-messages="errorFields.gender"
                       type="address"
                       :items="['Male', 'Female']"
                       :rules="[requiredRule]"
@@ -99,6 +107,7 @@
                       outlined
                       prepend-inner-icon="mdi-calendar"
                       v-model="age"
+                      :error-messages="errorFields.age"
                       type="number"
                       :rules="[requiredRule]"
                     />
@@ -119,7 +128,7 @@
               rounded
               elevation="0"
               type="submit"
-              :loading="creatingCustomer"
+              :loading="loading.createCustomer || loading.editCustomer"
             >
               {{ selectedCustomer != null ? "Edit" : "Create" }} Customer
             </v-btn>

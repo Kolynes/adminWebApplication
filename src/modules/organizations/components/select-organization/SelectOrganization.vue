@@ -30,7 +30,7 @@
               prepend-inner-icon="mdi-magnify"
               placeholder="Search by name"
               clearable
-              :loading="searching"
+              :loading="loading.loadOrganizations"
               v-model="searchString"
             />
           </v-layout>

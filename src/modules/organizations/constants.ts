@@ -1,5 +1,7 @@
+import { IAccount, IUser, EUserType } from "../auth/types";
+import { IPractitioner } from "../practitioners/types";
 import { EProductTypes } from "../products/types";
-import { EOrganizationTypes } from "./types";
+import { EOrganizationTypes, IOrganization } from "./types";
 
 export const organizationTypeTexts = {
   [EOrganizationTypes.pharmacy]: "Pharmacy",
@@ -24,4 +26,26 @@ export const organizationTypeRoutes = {
 export const organizationTypeTextsByProductType = {
   [EProductTypes.drug]: "Pharmacy",
   [EProductTypes.equipment]: "OEM"
+}
+
+export const organizationLinks = {
+  name: "Organizations",
+  show: false,
+  active: false,
+  remove: (account: IAccount, user: IUser | IOrganization | IPractitioner) => {
+    if (account.userType == EUserType.admin) return false;
+    return true;
+  },
+  routes: [
+    {
+      icon: "mdi-pharmacy",
+      path: "/dashboard/pharmacies",
+      name: "Pharmacies"
+    },
+    {
+      icon: "mdi-truck-delivery",
+      path: "/dashboard/oems",
+      name: "OEMs"
+    },
+  ]
 }

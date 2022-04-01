@@ -1,17 +1,18 @@
 import IVForm from "@/utils/types/IVForm";
 import { emailRule, requiredLengthRule, requiredRule } from "@/utils/rules";
 import { service } from "@/utils/services/ServiceProvider";
-import {Vue, Component, Ref} from "vue-property-decorator";
+import { Vue, Component, Ref, Mixins, Watch } from "vue-property-decorator";
 import { EServices } from "@/types";
 import { IAdminCustomersClient, ICustomer, ICustomerEditor } from "@/modules/customers/types";
 import VPasswordField from "@/vuetify-extensions/VPasswordField.vue";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
     VPasswordField,
   }
 })
-export default class CustomerEditor extends Vue implements ICustomerEditor {
+export default class CustomerEditor extends Mixins(NetworkManagerMixin) implements ICustomerEditor {
   @service(EServices.adminCustomers)
   customersClient!: IAdminCustomersClient;
 
@@ -26,7 +27,6 @@ export default class CustomerEditor extends Vue implements ICustomerEditor {
   age = "";
   city = "";
   state = "";
-  creatingCustomer = false;
   selectedCustomer: number | null = null;
 
   @Ref()
@@ -38,7 +38,7 @@ export default class CustomerEditor extends Vue implements ICustomerEditor {
 
   toggleCreateCustomerDialog() {
     this.createCustomerDialogVisible = !this.createCustomerDialogVisible;
-    if(!this.createCustomerDialogVisible){
+    if (!this.createCustomerDialogVisible) {
       this.selectedCustomer = null;
       this.createCustomerForm.reset();
     }
@@ -52,49 +52,43 @@ export default class CustomerEditor extends Vue implements ICustomerEditor {
     this.toggleCreateCustomerDialog();
   }
 
+  @throwsNetworkError()
   async editCustomer() {
-    if(this.createCustomerForm.validate()) {
-      this.creatingCustomer = true;
-      const response = await this.customersClient.updateCustomer(
-        this.selectedCustomer!, 
-        this.firstName, 
-        this.lastName, 
-        this.phoneNumber
-      );
-      this.creatingCustomer = false;
-      if(response.status == 200) {
-        toast({ message: "User updated"});
-        this.$emit("saved");
-        this.toggleCreateCustomerDialog();
-        this.selectedCustomer = null
-      }
-      else toast({ message: response.errors!.summary });
-    }
+    if (!this.createCustomerForm.validate()) return
+    await this.customersClient.updateCustomer(
+      this.selectedCustomer!,
+      this.firstName,
+      this.lastName,
+      this.phoneNumber
+    );
+    toast({ icon: "mdi-check", iconColor: "green", message: "User updated" });
+    this.$emit("saved");
+    this.toggleCreateCustomerDialog();
   }
 
+  @throwsNetworkError()
   async createCustomer() {
-    if(this.createCustomerForm.validate()) {
-      this.creatingCustomer = true;
-      const response = await this.customersClient.createCustomer(
-        this.firstName, 
-        this.lastName, 
-        this.email, 
-        this.phoneNumber, 
-        this.address,
-        this.gender,
-        this.age,
-        this.city,
-        this.state,
-        this.password
-      );
-      this.creatingCustomer = false;
-      if(response.status == 201 || response.status == 200) {
-        toast({ message: "Customer created"});
-        this.$emit("saved");
-        this.toggleCreateCustomerDialog();
-        this.selectedCustomer = null;
-      }
-      else toast({ message: response.errors!.summary });
-    }
+    if (!this.createCustomerForm.validate()) return;
+    await this.customersClient.createCustomer(
+      this.firstName,
+      this.lastName,
+      this.email,
+      this.phoneNumber,
+      this.address,
+      this.gender,
+      this.age,
+      this.city,
+      this.state,
+      this.password
+    );
+    toast({ icon: "mdi-check", iconColor: "green", message: "Customer created" });
+    this.$emit("saved");
+    this.toggleCreateCustomerDialog();
+  }
+
+  @Watch("error.createCustomer")
+  @Watch("error.editCustomer")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }

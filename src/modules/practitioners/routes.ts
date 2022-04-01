@@ -1,4 +1,5 @@
 import { RouteConfig } from "vue-router";
+import { EUserType } from "../auth/types";
 import { EPractitionerTypes } from "./types";
 
 export default [
@@ -10,6 +11,7 @@ export default [
       route.query.type = EPractitionerTypes.doctor
       return route.query
     },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/doctors/details",
@@ -18,7 +20,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.doctor
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/nurses",
@@ -28,6 +31,7 @@ export default [
       route.query.type = EPractitionerTypes.nurse
       return route.query
     },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/nurses/details",
@@ -36,7 +40,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.nurse
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/physiotherapists",
@@ -45,7 +50,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.physiotherapist
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/physiotherapists/details",
@@ -54,7 +60,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.physiotherapist
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/hospitals",
@@ -63,7 +70,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.hospital
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/hospitals/details",
@@ -72,7 +80,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.hospital
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/laboratories",
@@ -81,7 +90,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.laboratory
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/laboratories/details",
@@ -90,7 +100,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.laboratory
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/ambulances",
@@ -99,7 +110,8 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.ambulance
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
   {
     path: "/dashboard/ambulances/details",
@@ -108,6 +120,7 @@ export default [
     props: route => {
       route.query.type = EPractitionerTypes.ambulance
       return route.query
-    }
+    },
+    meta: { requiredUserType: [EUserType.admin] }
   },
 ] as RouteConfig[];

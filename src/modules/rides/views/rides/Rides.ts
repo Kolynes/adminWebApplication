@@ -5,6 +5,7 @@ import { IAdminRidesClient, IRide, IRideEditor } from "../../types";
 import { service } from "@/utils/services/ServiceProvider";
 import { EServices } from "@/types";
 import RideEditor from "../../components/ride-editor/RideEditor";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -12,7 +13,7 @@ import RideEditor from "../../components/ride-editor/RideEditor";
     RideEditor
   }
 })
-export default class Rides extends Mixins(TableMixin) implements ITableView<IRide> {
+export default class Rides extends Mixins(TableMixin, NetworkManagerMixin) implements ITableView {
   headers = [
     {
       text: "ID",
@@ -35,7 +36,6 @@ export default class Rides extends Mixins(TableMixin) implements ITableView<IRid
       value: "licensePlate"
     },
   ];
-  items = [];
 
   @service(EServices.adminRides)
   ridesClient!: IAdminRidesClient;
@@ -47,40 +47,34 @@ export default class Rides extends Mixins(TableMixin) implements ITableView<IRid
     this.$router.push(`/dashboard/rides/details?id=${ride.id}`);
   }
 
-  deleteRide(ride: IRide) {
-    confirm({ icon: "mdi-delete", title: `Delete Ride` }).then(async (result: boolean) => {
-      if(result) {
-        toast({ loading: true, message: `Deleting ride...` });
-        const response = await this.ridesClient.deleteRide(ride.id);
-        toast(false);
-        if(response.status == 200) {
-          toast({ message: `Ride deleted`});
-          this.search();
-        }
-        else toast({ message: response.errors!.summary });
-      }
-    });
+  @throwsNetworkError()
+  async deleteRide(ride: IRide) {
+    const result = await confirm({ icon: "mdi-delete", title: `Delete Ride` });
+    if (!result) return;
+    toast({ loading: true, message: `Deleting ride...` });
+    await this.ridesClient.deleteRide(ride.id);
+    toast(false);
+    toast({ icon: "mdi-check", iconColor: "green", message: `Ride deleted` });
+    this.search();
   }
 
-  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults<IRide>> {
+  @throwsNetworkError()
+  async getSearchResults(searchString: string, page: number, pageSize: number): Promise<ISearchResults> {
     const response = await this.ridesClient.getRides(
-      searchString, 
-      page, 
+      searchString,
+      page,
       pageSize
     );
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        numberOfPages: response.numberOfPages || 0
-      }
+    return {
+      items: response.data,
+      numberOfPages: response.numberOfPages || 0
     }
-    else {
-      toast({ message: response.errors!.summary })
-      return {
-        items: this.items,
-        numberOfPages: this.numberOfPages
-      }
-    }
+  }
+
+  @Watch("error.deleteRide")
+  @Watch("error.getSearchResults")
+  onDeleteRideError(value: string) {
+    if(value) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message: value });
   }
 
   @Watch("type")

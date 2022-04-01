@@ -1,12 +1,12 @@
-import { IUser } from "@/modules/auth/types";
 import { EServices } from "@/types";
 import { service } from "@/utils/services/ServiceProvider";
-import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
+import { Component, Mixins, Prop, Ref, Watch } from "vue-property-decorator";
 import { EOrganizationTypes, IAdminOrganizationsClient, IOrganization, IOrganizationEditor, ISelectOrganization } from "../../types";
 import VScrollView from "@/vuetify-extensions/VScrollView.vue";
 import ILoaderResponse from "@/utils/types/ILoaderResponse";
 import OrganizationEditor from "../organization-editor/OrganizationEditor";
 import { icons } from "../../constants";
+import NetworkManagerMixin, { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -14,7 +14,7 @@ import { icons } from "../../constants";
     OrganizationEditor
   }
 })
-export default class SelectOrganization extends Vue implements ISelectOrganization {
+export default class SelectOrganization extends Mixins(NetworkManagerMixin) implements ISelectOrganization {
   @Prop({
     type: String,
     required: true
@@ -24,7 +24,6 @@ export default class SelectOrganization extends Vue implements ISelectOrganizati
   showDialog = false;
   searchString = "";
   refresh = false;
-  searching = false;
   searchTimeout: number | null = null;
   organizationResolve: Function | null = null;
 
@@ -48,24 +47,22 @@ export default class SelectOrganization extends Vue implements ISelectOrganizati
     });
   }
 
-  async loadOrganizations(page: number): Promise<ILoaderResponse<IUser>> {
-    this.searching = true;
+  @throwsNetworkError()
+  async loadOrganizations(page: number): Promise<ILoaderResponse> {
     const response = await this.organizationsClient.getOrganizations(
       this.type,
       this.searchString || "",
       page
     );
-    this.searching = false;
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        hasNextPage: response.hasNextPage as boolean
-      };
-    }
-    else return {
-      items: [],
-      hasNextPage: false
+    return {
+      items: response.data,
+      hasNextPage: response.hasNextPage as boolean
     };
+  }
+
+  @Watch("error.loadOrganizations")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 
   @Watch("searchString")

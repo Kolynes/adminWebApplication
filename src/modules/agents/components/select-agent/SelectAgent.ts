@@ -1,10 +1,11 @@
-import ServiceProvider, { service } from "@/utils/services/ServiceProvider";
+import { service } from "@/utils/services/ServiceProvider";
 import { Vue, Component, Watch, Ref } from "vue-property-decorator";
 import VScrollView from "@/vuetify-extensions/VScrollView.vue";
 import { IAdminAgentsClient, IAgent, IAgentEditor, ISelectAgent } from "../../types";
 import { EServices } from "@/types";
 import ILoaderResponse from "@/utils/types/ILoaderResponse";
 import AgentEditor from "../agent-editor/AgentEditor";
+import { throwsNetworkError } from "@/utils/http/NetworkManagerMixin";
 
 @Component({
   components: {
@@ -16,7 +17,6 @@ export default class SelectAgent extends Vue implements ISelectAgent {
   showDialog = false;
   searchString = "";
   refresh = false;
-  searching = false;
   searchTimeout: number | null = null;
   agentResolve: Function | null = null;
 
@@ -36,22 +36,15 @@ export default class SelectAgent extends Vue implements ISelectAgent {
     });
   }
 
-  async loadAgents(page: number): Promise<ILoaderResponse<IAgent>> {
-    this.searching = true;
+  @throwsNetworkError()
+  async loadAgents(page: number): Promise<ILoaderResponse> {
     const response = await this.agentClient.getActiveAgents(
       this.searchString || "",
       page
     );
-    this.searching = false;
-    if(response.status == 200) {
-      return {
-        items: response.data,
-        hasNextPage: response.hasNextPage as boolean
-      };
-    }
-    else return {
-      items: [],
-      hasNextPage: false
+    return {
+      items: response.data,
+      hasNextPage: response.hasNextPage as boolean
     };
   }
 
@@ -60,5 +53,10 @@ export default class SelectAgent extends Vue implements ISelectAgent {
     if(this.searchTimeout != null)
       clearTimeout(this.searchTimeout)
     this.searchTimeout = setTimeout(() => this.refresh = true, 500)
+  }
+
+  @Watch("error.loadAgents")
+  onError(message: string) {
+    if(message) toast({ icon: "mdi-exclamation-thick", iconColor: "red", message });
   }
 }
